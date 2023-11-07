@@ -17,18 +17,7 @@ const PlantquestGeofenceDisplay = L.Control.extend({
     // let geo = new Geofence(null, null)
     // console.log('geo:', geo)
 
-    self.clearGeofences()
-
-    //
-
-    // Load entities.
-    const entnames = ['building', 'level', 'room', 'geofence', 'asset']
-
-    // Clear previous data.
-    for (let kind of entnames) {
-      self.data[kind] = self.data[kind] || []
-      self.data[kind].length = 0
-    }
+    self.data.geofence = ['mock-data-1', 'mock-data-2', 'mock-data-3']
 
     self.data.geofence.forEach((ent) => {
       let geofence = new Geofence(ent, ctx)
@@ -93,10 +82,6 @@ const PlantquestGeofenceDisplay = L.Control.extend({
         geofence: null,
       })
     }
-
-    //
-
-    let ents = ['asset', 'room', 'building', 'level', 'geofence']
 
     //
     return div
