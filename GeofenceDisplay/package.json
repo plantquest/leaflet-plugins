@@ -17,7 +17,7 @@
     "watch": "tsc -w & vite dev",
     "build": "tsc && vite build"
   },
-  "author": "",
+  "author": "Ríona Stokes (https://github.com/rionastokes)",
   "license": "MIT",
   "devDependencies": {
     "@types/geojson": "^7946.0.12",
