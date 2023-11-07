@@ -29,21 +29,18 @@ const PlantquestGeofenceDisplay = L.Control.extend({
 
     loadData()
 
-    //
-
-    self.map.createPane('geofence')
-    let geofencePane = self.map.getPane('geofence')
+    // GeofencePane related code
+    _map.createPane('geofence')
+    let geofencePane = _map.getPane('geofence')
     geofencePane.style.zIndex = 230
     geofencePane.style.pointerEvents = 'none'
 
-    self.map.createPane('geofenceLabel')
-    let geofenceLabelPane = self.map.getPane('geofenceLabel')
+    _map.createPane('geofenceLabel')
+    let geofenceLabelPane = _map.getPane('geofenceLabel')
     geofenceLabelPane.style.zIndex = 235
     geofenceLabelPane.style.pointerEvents = 'none'
 
-    self.layer.geofence = L.layerGroup(null, { pane: 'geofence' }).addTo(
-      self.map
-    )
+    self.layer.geofence = L.layerGroup(null, { pane: 'geofence' }).addTo(_map)
     self.layer.geofence.name$ = 'geofence'
 
     //
