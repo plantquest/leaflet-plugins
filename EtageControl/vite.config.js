@@ -12,13 +12,13 @@ export default defineConfig({
     rollupOptions: {
       treeshake: false,
       output: {
-        assetFileNames: "group-select.[ext]",
+        assetFileNames: "etage-control.[ext]",
       },
     },
     lib: {
-      entry: resolve(__dirname, 'src/group-select.ts'),
-      name: 'PlantquestGroupSelect',
-      fileName: 'group-select',
+      entry: resolve(__dirname, 'src/etage-control.ts'),
+      name: 'PlantquestEtageControl',
+      fileName: 'etage-control',
     },
   },
   plugins: [dts()],
