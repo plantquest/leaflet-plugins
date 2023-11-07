@@ -17,19 +17,21 @@ const PlantquestGeofenceDisplay = L.Control.extend({
     // let geo = new Geofence(null, null)
     // console.log('geo:', geo)
 
+    // TODO: Define format and value of mock geofence data in dev/main.js
     self.data.geofence = ['mock-data-1', 'mock-data-2', 'mock-data-3']
 
+    // TODO: Extract geofence.prepare() function
     self.data.geofence.forEach((ent) => {
       let geofence = new Geofence(ent, ctx)
       self.geofence.map[ent.id] =
         self.config.geofence.prepare(geofence) || geofence
     })
 
-    //
-
+    // TODO: relevant?
     loadData()
 
     // GeofencePane related code
+    // TODO: Tie in with existing setup
     _map.createPane('geofence')
     let geofencePane = _map.getPane('geofence')
     geofencePane.style.zIndex = 230
@@ -45,6 +47,7 @@ const PlantquestGeofenceDisplay = L.Control.extend({
 
     //
 
+    // TODO: show/clear geofence functionality required here?
     self.showGeofence = function (geofence, show) {
       if (null == geofence) {
         return
@@ -69,18 +72,8 @@ const PlantquestGeofenceDisplay = L.Control.extend({
       }
     }
 
-    //
+    // TODO: add geofencePane to div
 
-    if (self.config.geofence.show.all) {
-      self.send({
-        srv: 'plantquest',
-        part: 'assetmap',
-        show: 'geofence',
-        geofence: null,
-      })
-    }
-
-    //
     return div
   },
 
