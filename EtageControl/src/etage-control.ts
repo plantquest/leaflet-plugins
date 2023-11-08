@@ -1,130 +1,142 @@
-
 import L from 'leaflet'
 import './etage-control.css'
 
-
-
-
 const PlantquestEtageControl = L.Control.extend({
-
   options: {
-    position: 'topright',
+    position: 'topright'
   },
 
-
-
-  initialize: function(this: any, options: any) {
+  initialize: function (this: any, options: any) {
     console.log('PGS init')
-    this._state = {
-      open: false,
-      atype: {},
-      roomattr: {},
-      menuitems: [],
-    }
+    this._state = {}
     L.Util.setOptions(this, options)
   },
 
-  onAdd: function(this: any, _map: any) {
+  onAdd: function (this: any, _map: any) {
     let self = this
 
-    console.log('PGS onAdd', this.options)
     let div = L.DomUtil.create('div')
-    div.classList.add('pqs-map-control-group')
-
-    let activate = L.DomUtil.create('div')
-    activate.classList.add('pqs-map-control-group-activate')
-    // activate.innerHTML = '<i aria-hidden="true" class="v-icon notranslate vxg-icon mdi mdi-map-search-outline theme--light" style="font-size: 24px; padding: 8px; color: black;"></i>'
-    activate.innerHTML = '<div style="color:red;"><b>GS</b></div>'
-    activate.addEventListener('click', () => {
-      this._state.open = !this._state.open
-
-      if (this._state.open) {
-        div.appendChild(this._menu)
-      }
-      else {
-        div.removeChild(this._menu)
-      }
-    })
-
-    let menu = this._menu = L.DomUtil.create('div')
-    menu.classList.add('pqs-map-control-group-menu')
+    div.classList.add('leaflet-control')
 
     let ul = L.DomUtil.create('ul')
+    ul.classList.add('leaflet-control-toolbar')
+    ul.classList.add('leaflet-toolbar-0')
+    ul.classList.add('plantquest-tool-building')
 
-    let li = L.DomUtil.create('li')
-    li.classList.add('pqs-map-control-group-menu-head')
-    li.innerText = 'ROOM/AREA ATTRIBUTES'
-    ul.appendChild(li)
+    let selectors: HTMLLIElement[] = []
 
-    for (let attrField in this.options.room.attr) {
-      li = L.DomUtil.create('li')
-      li.innerText = this.options.room.attr[attrField]
-      li.addEventListener('click', ((attrField, li) => () => {
-        self.options.toggleGroup('roomattr', attrField)
-        self._state.roomattr[attrField] = !self._state.roomattr[attrField]
-        if (self._state.roomattr[attrField]) {
-          li.classList.add('pqs-map-control-group-active')
-        }
-        else {
-          li.classList.remove('pqs-map-control-group-active')
-        }
-      })(attrField, li))
+    const buildings = [
+      { id: 'bldg_a', name: 'Building A', center: [51.505, -0.09] },
+      { id: 'bldg_b', name: 'Building B', center: [51.51, -0.11] }
+      // TESTING! Just mockup data.
+    ]
+
+    buildings.forEach((building, index) => {
+      let li = L.DomUtil.create('li')
+      li.classList.add('plantquest-tool-select-building')
+      li.setAttribute('data-plantquest-building', building.id)
+
+      let a = L.DomUtil.create('a')
+      a.classList.add('leaflet-toolbar-icon')
+      a.setAttribute('href', '#')
+      a.innerText = building.name.replace('Building ', '')
+
+      li.appendChild(a)
       ul.appendChild(li)
-      this._state.menuitems.push(li)
-    }
 
+      selectors.push(li)
 
-    li = L.DomUtil.create('li')
-    li.classList.add('pqs-map-control-group-menu-head')
-    li.innerText = 'POINTS OF INTEREST'
-    ul.appendChild(li)
+      L.DomEvent.on(li, 'click', L.DomEvent.stop).on(li, 'click', function () {
+        self._selectBuilding(building, selectors);
+      }, self);
+    })
 
-
-    for (let atype of this.options.asset.atypes) {
-      li = L.DomUtil.create('li')
-      li.innerText = atype
-      li.addEventListener('click', ((atype, li) => () => {
-        self.options.toggleGroup('asset', atype)
-        self._state.atype[atype] = !self._state.atype[atype]
-        if (self._state.atype[atype]) {
-          li.classList.add('pqs-map-control-group-active')
-        }
-        else {
-          li.classList.remove('pqs-map-control-group-active')
-        }
-      })(atype, li))
-      ul.appendChild(li)
-      this._state.menuitems.push(li)
-    }
-
-    menu.appendChild(ul)
-    // menu.innerText = 'MENU'
-
-    div.appendChild(activate)
+    div.appendChild(ul)
 
     return div
   },
 
+  onRemove: function (this: any, _map: any) {},
 
-  onRemove: function(this: any, _map: any) {
-    console.log('PGS onRemove')
+  _selectBuilding: function (building: any, selectors: any) {
+    this._state.currentBuilding = building;
+    let coords = c_asset_coords({
+      x: building.center[0],
+      y: building.center[1],
+    });
+    this._map.setView(coords, this.options.mapMinZoom + 1);
+    this.addLevelControl();
+
+    selectors.forEach((selector: any) => {
+      selector.classList.remove("plantquest-tool-select-building-active");
+      if (building.id === selector.getAttribute("data-plantquest-building")) {
+        selector.classList.add("plantquest-tool-select-building-active");
+      }
+    });
   },
 
+  addLevelControl: function () {
+    let self = this
 
-  clear: function(this: any) {
-    for (let p in this._state.atype) {
-      this._state.atype[p] = false
+    if (self.current.levelControl) {
+      self.current.levelControl.remove()
     }
 
-    for (let p in this._state.roomattr) {
-      this._state.roomattr[p] = false
-    }
-
-    this._state.menuitems.map((li: any) =>
-      li.classList.remove('pqs-map-control-group-active')
+    let levelActions: any[] = []
+    let levelsForBuilding = self.data.level.filter(
+      level => level.building_id === self.current.building?.id
     )
-  }
-})
 
+    levelsForBuilding.forEach((level: any, index: any) => {
+      levelActions.push(
+        L.Toolbar2.Action.extend({
+          options: {
+            toolbarIcon: {
+              html: level.name
+            }
+          },
+
+          addHooks: function () {
+            self.showMap(index, {
+              centerView: false,
+              startZoom: false,
+              showAllAssets: false,
+              showLevelAssets: true,
+              whence: 'toolbarlevel'
+            })
+          }
+        })
+      )
+    })
+
+    let levelToolbar = new L.Toolbar2.Control({
+      actions: levelActions,
+      position: 'topright',
+      className: 'plantquest-tool-level'
+    })
+
+    self.map.addLayer(levelToolbar)
+    self.current.levelControl = levelToolbar
+  },
+
+  c_asset_coords: function (coords: any) {
+    return new L.LatLng(coords.x, coords.y);
+  },
+
+  showMap: function (levelIndex: any, options: any) {
+    let level = this.options.levels[levelIndex];
+    if (!level) {
+      console.error('Level not found.');
+      return;
+    }
+
+    let levelCoords = this.c_asset_coords({ x: level.lat, y: level.lng });
+    if (options.centerView) {
+      this.map.setView(levelCoords, options.startZoom ? this.options.mapMinZoom + 1 : this.map.getZoom());
+    }
+
+    // Additional logic to show/hide assets can go here
+  },
+})
 
 export { PlantquestEtageControl }

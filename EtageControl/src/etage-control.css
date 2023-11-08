@@ -1,46 +1,56 @@
-
-.pqs-map-control-group {
-    position: relative;
-}
-
-.pqs-map-control-group-activate {
-    background-color: #FFF;
-    position: absolute;
-    top: 0;
-    right: 16px;
-    width: 42px;
+/* TODO: Define better and suitable styles */
+.leaflet-control {
+    background-color: white;
     border-radius: 4px;
-    border: 2px solid rgba(0,0,0,0.2);
-}
-
-.pqs-map-control-group-menu {
-    position: absolute;
-    top: 0px;
-    right: 64px;
-    width: 200px;
-    border-radius: 4px;
-    border: 2px solid rgba(0,0,0,0.2);
-
-}
-
-.pqs-map-control-group-active {
-    background-color: #CCC !important;
-}
-
-li.pqs-map-control-group-menu-head {
-  font-weight: bold;
-}
-
-.pqs-map-control-group-menu > ul {
-    background-color: #FFF;
-    padding: 0;
-    margin: 0;
-}
-
-.pqs-map-control-group-menu > ul > li {
-    background-color: #FFF;
-    padding: 4px;
-    margin: 0;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.4);
+    cursor: pointer;
+  }
+  
+  .leaflet-control-toolbar {
     list-style-type: none;
-    border-bottom: 1px solid #ccc;
-}
+    margin: 0;
+    padding: 0;
+  }
+  
+  .leaflet-toolbar-0 {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .plantquest-tool-building {
+    padding: 10px;
+  }
+  
+  .plantquest-tool-select-building {
+    margin-bottom: 5px;
+    text-align: center;
+  }
+  
+  .plantquest-tool-select-building a {
+    text-decoration: none;
+    color: black;
+    display: block;
+    padding: 5px 10px;
+  }
+  
+  .plantquest-tool-select-building-active {
+    background-color: #8cc63f;
+  }
+  
+  .plantquest-tool-select-building-active a {
+    color: white;
+  }
+  
+  .leaflet-toolbar-icon {
+    background-size: 20px 20px;
+    background-position: center center;
+    background-repeat: no-repeat;
+  }
+  
+  .plantquest-tool-level {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 1000; 
+  }
+    
