@@ -1,5 +1,6 @@
 let Leaflet = require('./verify/leaflet')
-require('./verify/L.WatermarkControl')
+// require('./verify/L.WatermarkControl')
+let { PlantquestGeofenceDisplay } = require('../src/geofence-display.ts')
 
 describe('leaflet', () => {
   test('happy', () => {
@@ -12,23 +13,22 @@ describe('leaflet', () => {
   })
 
   test('plugin-happy', () => {
-    let map = L.map(document.createElement('div'))
-    let watermark = L.control.watermark()
-    expect(watermark).toBeDefined()
+    let geo = PlantquestGeofenceDisplay()
+    expect(geo).toBeDefined()
   })
 
   test('plugin-map', () => {
     let map = L.map(document.createElement('div'))
-    let watermark = L.control.watermark()
-    watermark.addTo(map)
+    let geo = PlantquestGeofenceDisplay()
+    geo.addTo(map)
     expect(map).toBeDefined()
   })
 
   test('plugin-container', () => {
     let map = L.map(document.createElement('div'))
-    let watermark = L.control.watermark()
-    watermark.addTo(map)
-    let wmcontainer = watermark.getContainer()
-    expect(wmcontainer).toBeDefined()
+    let geo = PlantquestGeofenceDisplay()
+    geo.addTo(map)
+    let geocontainer = geo.getContainer()
+    expect(geocontainer).toBeDefined()
   })
 })
