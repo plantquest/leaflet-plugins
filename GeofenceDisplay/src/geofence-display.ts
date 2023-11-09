@@ -21,12 +21,12 @@ const PlantquestGeofenceDisplay = L.Layer.extend({
 
   onAdd: function (this: any, _map: any) {
     console.log('PGeoD onAdd', this.options)
-    let div = L.DomUtil.create('div')
+    // let div = L.DomUtil.create('div')
 
     let geo = new Geofence(null, null)
     console.log('geo:', geo)
 
-    geo.show(div)
+    geo.show(_map)
 
     // // TODO: Define format and value of mock geofence data in dev/main.js
     // self.data.geofence = ['mock-data-1', 'mock-data-2', 'mock-data-3']
@@ -82,7 +82,7 @@ const PlantquestGeofenceDisplay = L.Layer.extend({
 
     // // TODO: add geofencePane to div
 
-    return div
+    return _map
   },
 
   onRemove: function (this: any, _map: any) {
