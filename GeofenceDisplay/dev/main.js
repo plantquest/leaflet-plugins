@@ -16,6 +16,17 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
 }).addTo(map)
 
-const plantquestGeofenceDisplay = new PlantquestGeofenceDisplay()
+const plantquestGeofenceDisplay = new PlantquestGeofenceDisplay({
+  geo1: {
+    title: 'geofence ahoy!',
+    latlngs: [
+      [37, -109.05],
+      [41, -109.03],
+      [41, -102.05],
+      [37, -102.04],
+    ],
+    colour: 'blue',
+  },
+})
 
 plantquestGeofenceDisplay.addTo(map)
