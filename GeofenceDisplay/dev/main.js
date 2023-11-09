@@ -16,24 +16,6 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
 }).addTo(map)
 
-const plantquestGeofenceDisplay = new PlantquestGeofenceDisplay({
-  position: 'topright',
-  asset: {
-    atypes: ['Emergency Exit', 'De-Fibrilator', 'Muster Point'],
-  },
-  room: {
-    attr: {
-      data8: 'Meeting Room',
-      data9: 'Plant Room',
-      data10: 'ATEX Area',
-      data11: 'Noise >80db',
-      data12: 'Production Area',
-      data13: 'PPE Required',
-    },
-  },
-  toggleGroup: (kind, value) => {
-    console.log('toggleGroup', kind, value)
-  },
-})
+const plantquestGeofenceDisplay = new PlantquestGeofenceDisplay()
 
 plantquestGeofenceDisplay.addTo(map)
