@@ -2,30 +2,32 @@ export {}
 
 import L from 'leaflet'
 import './geofence-display.css'
+import './rastercoords.js'
 
 const PlantquestGeofenceDisplay = L.Layer.extend({
-  options: {
-    // geofenceLabelPane.style.zIndex = 235
-    // provide geofence data to component using an option
-  },
-
   initialize: function (this: any, options: any) {
     console.log('PGeoD init')
+    L.Util.setOptions(this, options)
     this._state = {
-      // this._state.GeofenceByID
+      // geofenceLabelPane.style.zIndex = 235
+      //
+      // this._state.GeofenceByID <-- move below map to here
       // self.geofence.map[ent.id] = self.config.geofence.prepare(geofence) || geofence
       //
-      // self.data goes in here
-      // self.data.geofence = ['mock-data-1', 'mock-data-2', 'mock-data-3']
+      zindex: 0,
+      geofenceByID: {},
     }
-    L.Util.setOptions(this, options)
+    this._state.geofenceByID = options
   },
 
   onAdd: function (this: any, _map: any) {
+    let self = this
+    console.log('self:', self)
+
     console.log('PGeoD onAdd', this.options)
     // let div = L.DomUtil.create('div')
 
-    let geo = new Geofence(null, null)
+    let geo = new Geofence(self._state.geofenceByID.geo1, null)
     console.log('geo:', geo)
 
     geo.show(_map)
@@ -97,17 +99,9 @@ const PlantquestGeofenceDisplay = L.Layer.extend({
 })
 
 class Geofence {
-  ent = null
-  ctx = null
-  poly = L.polygon(
-    [
-      [37, -109.05],
-      [41, -109.03],
-      [41, -102.05],
-      [37, -102.04],
-    ],
-    { color: 'red' }
-  )
+  ent: any = null
+  ctx: any = null
+  poly: any = null
 
   constructor(ent: any, ctx: any) {
     this.ent = ent
@@ -116,28 +110,32 @@ class Geofence {
 
   show(layer: any) {
     if (null == this.poly) {
-      // let polyCoords = convertPoly(this.ctx.cfg.mapImg, this.ent.polygon)
-      // this.poly = L.polygon(polyCoords, {
-      //   pane: 'geofence',
-      //   color: this.ctx.cfg.geofence.color,
-      // })
+      // let polyCoords = this.convertPoly(this.ctx.cfg.mapImg, this.ent.polygon)
+      console.log('geoshow-this.ent:', this.ent)
+      let polyCoords = this.ent.latlngs
+      console.log('geoshow-this.ent.colour:', this.ent.colour)
+      this.poly = L.polygon(polyCoords, {
+        pane: 'geofence',
+        // color: this.ctx.cfg.geofence.color,
+        color: this.ent.colour,
+      })
       // if (this.ctx.cfg.geofence.click.active) {
       //   this.poly.on('click', this.onClick.bind(this))
       // }
-      // let tooltip = L.tooltip({
-      //   pane: 'geofenceLabel',
-      //   permanent: true,
-      //   direction: 'center',
-      //   opacity: 1,
-      //   className: 'polygon-labels',
-      // })
-      // this.poly.bindTooltip(tooltip)
-      // tooltip.setContent(
-      //   '<div class="' +
-      //     'leaflet-zoom-animated ' +
-      //     'plantquest-geofence-label ' +
-      //     `">${this.ent.title}</div>`
-      // )
+      let tooltip = L.tooltip({
+        pane: 'geofenceLabel',
+        permanent: true,
+        direction: 'center',
+        opacity: 1,
+        className: 'polygon-labels',
+      })
+      this.poly.bindTooltip(tooltip)
+      tooltip.setContent(
+        '<div class="' +
+          'leaflet-zoom-animated ' +
+          'plantquest-geofence-label ' +
+          `">${this.ent.title}</div>`
+      )
     }
 
     this.poly.addTo(layer)
@@ -147,8 +145,18 @@ class Geofence {
     // this.poly && this.poly.remove()
   }
 
-  // onClick(event: any) {
-  //   // TODO: emit
+  onClick(event: any) {
+    console.log('Click!:', event)
+  }
+
+  // convertPoly(img: any, poly: any) {
+  //   // Quote from docs: 'unproject `coords` to the raster coordinates used by the raster image projection'
+  //   let p = []
+  //   let rc = new L.RasterCoords(self.map, self.config.mapImg)
+  //   for (let part of poly) {
+  //     p.push(rc.unproject([part[1], part[0]]))
+  //   }
+  //   return p
   // }
 }
 
