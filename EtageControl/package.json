@@ -15,7 +15,8 @@
   "scripts": {
     "dev": "vite dev",
     "watch": "tsc -w & vite dev",
-    "build": "tsc && vite build"
+    "build": "tsc && vite build",
+    "redev": "npm run build && cd dev/ && npm run dev"
   },
   "author": "Jose Perigolo - https://github.com/Jose-Perigolo",
   "license": "MIT",
