@@ -6,8 +6,7 @@ import L from 'leaflet'
 import '@plantquest/etage-control/dist/etage-control.css'
 import { PlantquestEtageControl } from '@plantquest/etage-control'
 
-
-const map = L.map('map').setView([51.505, -0.09], 13)
+const map = L.map('map').setView([51.505, -0.09], 20)
 
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
@@ -15,23 +14,26 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 }).addTo(map)
 
 // In progress:
-// Just some mock-up options for buildings and floors, testing it visually.
+// Just some mock-up options for buildings and LEVELS, testing it visually.
 const etageControlOptions = {
   position: 'topright',
   buildings: [
-    { name: 'Building A', center: [51.505, -0.09], zoom: 18 },
-    { name: 'Building B', center: [51.510, -0.11], zoom: 18 },
-    // ... more buildings
+    { id: 'buildingA', name: 'Building A', center: [51.505, -0.09], zoom: 20 },
+    { id: 'buildingB', name: 'Building B', center: [51.5051, -0.088], zoom: 20 },
+    { id: 'buildingC', name: 'Building C', center: [51.5054, -0.092], zoom: 20 },
   ],
-  floors: [
-    { name: 'Floor 1', data: 'Data for Floor 1' },
-    { name: 'Floor 2', data: 'Data for Floor 2' },
-    // ... more floors
+  levels: [
+    { id: 'floor1', name: 'Floor 1', buildingId: 'buildingA' },
+    { id: 'floor2', name: 'Floor 2', buildingId: 'buildingA' },
+    { id: 'floor1', name: 'Floor 1', buildingId: 'buildingB' },
+    { id: 'floor2', name: 'Floor 2', buildingId: 'buildingB' },
+    { id: 'floor3', name: 'Floor 3', buildingId: 'buildingB' },
+    { id: 'basement', name: 'Basement', buildingId: 'buildingB' },
+    { id: 'floor1', name: 'Floor 1', buildingId: 'buildingC' },
+    { id: 'floor2', name: 'Floor 2', buildingId: 'buildingC' },
   ]
 };
-
 
 const plantquestEtageControl = new PlantquestEtageControl(etageControlOptions)
 
 plantquestEtageControl.addTo(map)
-
