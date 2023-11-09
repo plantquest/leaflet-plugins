@@ -16,7 +16,9 @@
     "dev": "vite dev",
     "watch": "tsc -w & vite dev",
     "build": "tsc && vite build",
-    "redev": "npm run build && cd dev/ && npm run dev"
+    "redev": "npm run build && cd dev/ && npm run dev",
+    "test-web": "tsc --module esnext && npm run build-web && browserify -p tsify -i util -o test/verify/web.js -e test/verify/entry.js -im && see test/verify/web.html",
+    "build-web": "browserify -p tsify -i util -o test/verify/leaflet.js -e test/verify/leaflet.web.js -s Leaflet -i"
   },
   "author": "Jose Perigolo - https://github.com/Jose-Perigolo",
   "license": "MIT",
