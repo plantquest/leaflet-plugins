@@ -16,8 +16,8 @@
     "dev": "vite dev",
     "watch": "tsc -w & vite dev",
     "build": "tsc && vite build",
-    "test-web": "tsc && npm run build-web && browserify -i util -o test/verify/web.js -e test/verify/entry.js -im && see test/verify/web.html",
-    "build-web": "browserify -i util -o test/verify/leaflet.js -e test/verify/leaflet.web.js -s Leaflet -i",
+    "test-web": "tsc --module esnext && npm run build-web && browserify -p tsify -i util -o test/verify/web.js -e test/verify/entry.js -im && see test/verify/web.html",
+    "build-web": "browserify -p tsify -i util -o test/verify/leaflet.js -e test/verify/leaflet.web.js -s Leaflet -i",
     "redev": "npm run build && cd dev/ && npm run dev"
   },
   "author": "Ríona Stokes (https://github.com/rionastokes)",
@@ -31,6 +31,7 @@
     "jest": "^29.7.0",
     "leaflet": "^1.9.4",
     "ts-jest": "^29.1.1",
+    "tsify": "^5.0.4",
     "typescript": "^5.0.2",
     "vite": "^4.4.5",
     "vite-plugin-dts": "^3.6.3",

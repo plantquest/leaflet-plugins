@@ -1,3 +1,5 @@
+export {}
+
 import L from 'leaflet'
 import './geofence-display.css'
 

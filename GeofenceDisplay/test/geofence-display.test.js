@@ -1,5 +1,4 @@
 let Leaflet = require('./verify/leaflet')
-// require('./verify/L.WatermarkControl')
 let { PlantquestGeofenceDisplay } = require('../src/geofence-display.ts')
 
 describe('leaflet', () => {
