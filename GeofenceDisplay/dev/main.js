@@ -20,13 +20,25 @@ const plantquestGeofenceDisplay = new PlantquestGeofenceDisplay({
   geo1: {
     title: 'geofence ahoy!',
     latlngs: [
-      [37, -109.05],
-      [41, -109.03],
-      [41, -102.05],
-      [37, -102.04],
+      [51.505, -0.09],
+      [51.504, -0.09],
+      [51.505, -0.08],
+      [51.504, -0.08],
     ],
-    colour: 'blue',
+    colour: 'red',
   },
 })
 
 plantquestGeofenceDisplay.addTo(map)
+console.log('geoobj:', plantquestGeofenceDisplay)
+
+// map.fitBounds(plantquestGeofenceDisplay.getBounds())
+
+// let poly = L.polygon([
+//   [51.505, -0.09],
+//   [51.504, -0.09],
+//   [51.505, -0.08],
+//   [51.504, -0.08],
+// ]).addTo(map)
+
+// map.fitBounds(poly.getBounds())

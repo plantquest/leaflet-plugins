@@ -30,7 +30,9 @@ const PlantquestGeofenceDisplay = L.Layer.extend({
     let geo = new Geofence(self._state.geofenceByID.geo1, null)
     console.log('geo:', geo)
 
-    geo.show(_map)
+    let geofence = geo.show()
+
+    return geofence
 
     // // TODO: Define format and value of mock geofence data in dev/main.js
     // self.data.geofence = ['mock-data-1', 'mock-data-2', 'mock-data-3']
@@ -85,8 +87,6 @@ const PlantquestGeofenceDisplay = L.Layer.extend({
     // }
 
     // // TODO: add geofencePane to div
-
-    return _map
   },
 
   onRemove: function (this: any, _map: any) {
@@ -108,12 +108,10 @@ class Geofence {
     this.ctx = ctx
   }
 
-  show(layer: any) {
+  show() {
     if (null == this.poly) {
       // let polyCoords = this.convertPoly(this.ctx.cfg.mapImg, this.ent.polygon)
-      console.log('geoshow-this.ent:', this.ent)
       let polyCoords = this.ent.latlngs
-      console.log('geoshow-this.ent.colour:', this.ent.colour)
       this.poly = L.polygon(polyCoords, {
         pane: 'geofence',
         // color: this.ctx.cfg.geofence.color,
@@ -122,23 +120,23 @@ class Geofence {
       // if (this.ctx.cfg.geofence.click.active) {
       //   this.poly.on('click', this.onClick.bind(this))
       // }
-      let tooltip = L.tooltip({
-        pane: 'geofenceLabel',
-        permanent: true,
-        direction: 'center',
-        opacity: 1,
-        className: 'polygon-labels',
-      })
-      this.poly.bindTooltip(tooltip)
-      tooltip.setContent(
-        '<div class="' +
-          'leaflet-zoom-animated ' +
-          'plantquest-geofence-label ' +
-          `">${this.ent.title}</div>`
-      )
+      // let tooltip = L.tooltip({
+      //   pane: 'geofenceLabel',
+      //   permanent: true,
+      //   direction: 'center',
+      //   opacity: 1,
+      //   className: 'polygon-labels',
+      // })
+      // this.poly.bindTooltip(tooltip)
+      // tooltip.setContent(
+      //   '<div class="' +
+      //     'leaflet-zoom-animated ' +
+      //     'plantquest-geofence-label ' +
+      //     `">${this.ent.title}</div>`
+      // )
     }
 
-    this.poly.addTo(layer)
+    return this.poly
   }
 
   hide() {
