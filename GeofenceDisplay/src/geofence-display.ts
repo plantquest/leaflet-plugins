@@ -6,27 +6,42 @@ import './rastercoords.js'
 
 const PlantquestGeofenceDisplay = L.Layer.extend({
   initialize: function (this: any, options: any) {
-    console.log('PGeoD init')
+    console.log('GeofenceDisplay init function called.')
     L.Util.setOptions(this, options)
     this._state = {
       zindex: 0,
       geofenceByID: {},
     }
-    this._state.geofenceByID = options
   },
 
   onAdd: function (this: any, _map: any) {
+    console.log('GeofenceDisplay onAdd function called.')
     let self = this
-    let geo = new Geofence(self._state.geofenceByID.geo1, null)
-    geo.show(_map)
+    console.log('Local geofence variable before add:', self._state.geofenceByID)
+    for (let geodata in self.options.geofences) {
+      let geo = self.options.geofences[geodata]
+      let geofence = new Geofence(geo, null)
+      self._state.geofenceByID[geo.id] = geofence
+      geofence.show(_map)
+    }
+    console.log('Local geofence variable after add:', self._state.geofenceByID)
   },
 
   onRemove: function (this: any, _map: any) {
-    console.log('PGeoD onRemove')
-  },
-
-  clear: function (this: any) {
-    console.log('PGeoD clear')
+    console.log('GeofenceDisplay onRemove function called.')
+    let self = this
+    console.log(
+      'Local geofence variable before remove:',
+      self._state.geofenceByID
+    )
+    for (let id in self._state.geofenceByID) {
+      self._state.geofenceByID[id].hide()
+      delete self._state.geofenceByID[id]
+    }
+    console.log(
+      'Local geofence variable after remove:',
+      self._state.geofenceByID
+    )
   },
 })
 
@@ -47,16 +62,12 @@ class Geofence {
         color: this.ent.colour,
       })
     }
-
     this.poly.addTo(map)
   }
 
   hide() {
-    // this.poly && this.poly.remove()
-  }
-
-  onClick(event: any) {
-    console.log('Click!:', event)
+    console.log('Geofence class hide function called.')
+    this.poly && this.poly.remove()
   }
 
   // convertPoly(img: any, poly: any) {
