@@ -8,7 +8,7 @@ import { PlantquestGeofenceDisplay } from '@plantquest/geofence-display'
 
 console.log('START', PlantquestGeofenceDisplay)
 
-const map = L.map('map').setView([51.505, -0.09], 13)
+const map = L.map('map').setView([53.27, -9.055], 16)
 
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 19,
@@ -17,16 +17,32 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 }).addTo(map)
 
 const plantquestGeofenceDisplay = new PlantquestGeofenceDisplay({
-  geo1: {
-    title: 'geofence ahoy!',
-    latlngs: [
-      [51.505, -0.09],
-      [51.504, -0.09],
-      [51.505, -0.08],
-      [51.504, -0.08],
-    ],
-    colour: 'purple',
-  },
+  geofences: [
+    {
+      id: 'coffeewerk',
+      title: 'Coffewerk+Press',
+      latlngs: [
+        [53.271455, -9.054129],
+        [53.271237, -9.054666],
+        [53.271096, -9.054494],
+        [53.270852, -9.054365],
+        [53.271404, -9.053936],
+      ],
+      colour: 'purple',
+    },
+    {
+      id: 'plamas',
+      title: 'Plámás',
+      latlngs: [
+        [53.270467, -9.058356],
+        [53.270197, -9.058871],
+        [53.270095, -9.058142],
+        [53.270172, -9.057584],
+      ],
+      colour: 'purple',
+    },
+  ],
 })
 
 plantquestGeofenceDisplay.addTo(map)
+// plantquestGeofenceDisplay.remove()
