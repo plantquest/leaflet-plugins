@@ -98,52 +98,48 @@ const PlantquestEtageControl = L.Control.extend({
     this._levelList = levelList // Storing the reference to update later
   },
 
-  // TODO: This method is too long and complicated, refactor it or split it into smaller methods
   _updateLevels: function (buildingId: string) {
-    if (!this._levelList) {
-      return
-    }
+    if (!this._levelList) return
+
     // Clear existing levels
     while (this._levelList.firstChild) {
       this._levelList.removeChild(this._levelList.firstChild)
     }
 
-    // Add new levels for the selected building
+    // Get levels for the building and populate or hide the list
     const levelsForBuilding =
       this._levels?.filter(level => level.buildingId === buildingId) || []
     if (levelsForBuilding.length > 0) {
-      this._levelList.style.display = '' // Show the levels list if there are levels for the building
-      levelsForBuilding.forEach(level => {
-        if (!this._levelList) {
-          return
-        }
-        const levelItem = L.DomUtil.create(
-          'li',
-          'plantquest-tool-select-building',
-          this._levelList
-        )
-        levelItem.dataset.plantquestLevel = level.id
-
-        const levelLink = L.DomUtil.create(
-          'a',
-          'leaflet-toolbar-icon',
-          levelItem
-        )
-        levelLink.href = '#'
-        levelLink.innerText = level.name
-
-        L.DomEvent.on(levelItem, 'click', e => {
-          if (!this._levelList) {
-            return
-          }
-          L.DomEvent.stop(e)
-          this._selectItem(level)
-          this._setActiveItem(levelItem, this._levelList)
-        })
-      })
+      this._levelList.style.display = '' // Show the list
+      levelsForBuilding.forEach(level =>
+        this._createAndAttachLevelListItem(level)
+      )
     } else {
-      this._levelList.style.display = 'none' // Hide the levels list if there are no levels for the building
+      this._levelList.style.display = 'none' // Hide the list if no levels for the building
     }
+  },
+
+  _createAndAttachLevelListItem: function (level: Level) {
+    if (!this._levelList) return
+
+    const levelItem = L.DomUtil.create(
+      'li',
+      'plantquest-tool-select-building',
+      this._levelList
+    )
+    levelItem.dataset.plantquestLevel = level.id
+
+    const levelLink = L.DomUtil.create('a', 'leaflet-toolbar-icon', levelItem)
+    levelLink.href = '#'
+    levelLink.innerText = level.name
+
+    L.DomEvent.on(levelItem, 'click', e => {
+      L.DomEvent.stop(e)
+      this._selectItem(level)
+      if (this._levelList) {
+        this._setActiveItem(levelItem, this._levelList)
+      }
+    })
   },
 
   _levelList: null as HTMLElement | null,
@@ -164,7 +160,6 @@ const PlantquestEtageControl = L.Control.extend({
     // Set the active class to the selected item
     selectedItem.classList.add('plantquest-tool-select-building-active')
   }
-
 })
 
 export { PlantquestEtageControl }
