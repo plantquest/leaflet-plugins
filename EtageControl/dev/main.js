@@ -13,7 +13,6 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 }).addTo(map)
 
-// In progress:
 // Just some mock-up options for buildings and LEVELS, testing it visually.
 const etageControlOptions = {
   position: 'topright',
@@ -30,7 +29,7 @@ const etageControlOptions = {
     { id: 'floor3', name: 'Floor 3', buildingId: 'buildingB' },
     { id: 'basement', name: 'Basement', buildingId: 'buildingB' },
     { id: 'floor1', name: 'Floor 1', buildingId: 'buildingC' },
-    { id: 'floor2', name: 'Floor 2', buildingId: 'buildingC' },
+    { id: 'floor2', name: 'Roof', buildingId: 'Roof' },
   ]
 };
 
