@@ -1,7 +1,7 @@
 import L from 'leaflet'
 // import Gubu from 'gubu'
 import './geofence-display.css'
-import { RasterCoords } from './rastercoords'
+// import { RasterCoords } from './rastercoords'
 
 // TODO: implement Gubu with interfaces
 interface Geofence {
