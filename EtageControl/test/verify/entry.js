@@ -93,4 +93,4 @@ window.expect = function (sval) {
   }
 }
 
-require('../geofence-display.test.js')
+require('../etage-control.test.js')
