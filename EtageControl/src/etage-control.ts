@@ -11,7 +11,7 @@ interface Building {
 interface Level {
   id: string
   name: string
-  buildingId: string
+  building_id: string
   center: [number, number] // We need this right now to use the same methods of the active option in the menu
   zoom: number
 }
@@ -21,6 +21,7 @@ interface Level {
 interface PlantquestEtageControlOptions extends L.ControlOptions {
   buildings?: Building[]
   levels?: Level[]
+  debug?: boolean
 }
 
 const PlantquestEtageControl = L.Control.extend({
@@ -32,22 +33,31 @@ const PlantquestEtageControl = L.Control.extend({
   _map: null as L.Map | null,
   _buildings: null as Building[] | null,
   _levels: null as Level[] | null,
+  _buildingList: null as HTMLElement | null,
+  _levelList: null as HTMLElement | null,
 
   initialize: function (options: PlantquestEtageControlOptions) {
+    this._logDebug(`Initializing EtageControl with options: ${JSON.stringify(options)}`);
+
     L.Util.setOptions(this, options)
     this._buildings = options.buildings || []
     this._levels = options.levels || []
   },
 
   onAdd: function (map: L.Map) {
+    this._logDebug(`Adding EtageControl to map: ${map}`);
+
     this._map = map
     const container = L.DomUtil.create('div', 'etage-control-container')
-
-    // TO BE VERIFIED
-    // I think we need to make sure events don't bubble up to the map
     L.DomEvent.disableClickPropagation(container)
 
     this._initLayout(container)
+
+    // Automatically select and highlight the first building and its levels
+    if (this._buildings && this._buildings.length > 0) {
+      const firstBuilding = this._buildings[0]
+      this._selectBuilding(firstBuilding)
+    }
 
     return container
   },
@@ -62,6 +72,8 @@ const PlantquestEtageControl = L.Control.extend({
       'leaflet-control-toolbar leaflet-toolbar-0 plantquest-tool-building',
       container
     )
+
+    this._buildingList = buildingList
 
     this._buildings?.forEach(building => {
       const buildingItem = L.DomUtil.create(
@@ -88,17 +100,52 @@ const PlantquestEtageControl = L.Control.extend({
       })
     })
 
-    // Level menu (initially empty)
-    const levelList = L.DomUtil.create(
+    // Automatically select and highlight the first building
+    if (this._buildings && this._buildings.length > 0) {
+      const firstBuilding = this._buildings[0]
+      const firstBuildingItem = container.querySelector(
+        `li[data-plantquest-building='${firstBuilding.id}']`
+      )
+      if (firstBuildingItem) {
+        this._setActiveItem(firstBuildingItem as HTMLElement, buildingList)
+        this._selectItem(firstBuilding) // Center the map on the first building
+        this._updateLevels(firstBuilding.id) // Update levels based on the first building
+      }
+    }
+
+    this._levelList = L.DomUtil.create(
       'ul',
       'leaflet-control-toolbar leaflet-toolbar-0 plantquest-tool-level',
       container
     )
-    levelList.style.display = 'none' // Hide the level list initially
-    this._levelList = levelList // Storing the reference to update later
+    if (this._buildings && this._buildings.length > 0) {
+      this._updateLevels(this._buildings[0].id)
+    }
   },
 
-  _updateLevels: function (buildingId: string) {
+  _selectBuilding: function (building: Building) {
+    this._logDebug(`Selecting building: ${building.id}`);
+
+    if (this._map) {
+      this._map.setView(building.center, building.zoom)
+    }
+
+    // Set active the corresponding building item
+    if (!this._buildingList) return
+    const buildingItem = this._buildingList.querySelector(
+      `li[data-plantquest-building='${building.id}']`
+    )
+    if (buildingItem) {
+      this._setActiveItem(buildingItem as HTMLElement, this._buildingList)
+    }
+
+    // Update levels for the selected building and select the first level
+    this._updateLevels(building.id)
+  },
+
+  _updateLevels: function (building_id: string) {
+    this._logDebug(`Updating levels for building: ${building_id}`);
+
     if (!this._levelList) return
 
     // Clear existing levels
@@ -106,16 +153,26 @@ const PlantquestEtageControl = L.Control.extend({
       this._levelList.removeChild(this._levelList.firstChild)
     }
 
-    // Get levels for the building and populate or hide the list
+    // Populate the list with levels for the building
     const levelsForBuilding =
-      this._levels?.filter(level => level.buildingId === buildingId) || []
+      this._levels?.filter(level => level.building_id === building_id) || []
     if (levelsForBuilding.length > 0) {
-      this._levelList.style.display = '' // Show the list
+      this._levelList.style.display = ''
       levelsForBuilding.forEach(level =>
         this._createAndAttachLevelListItem(level)
       )
+
+      // Select and highlight the first level of the new building
+      const firstLevel = levelsForBuilding[0]
+      this._selectItem(firstLevel)
+      const firstLevelItem = this._levelList.querySelector(
+        `li[data-plantquest-level='${firstLevel.id}']`
+      )
+      if (firstLevelItem) {
+        this._setActiveItem(firstLevelItem as HTMLElement, this._levelList)
+      }
     } else {
-      this._levelList.style.display = 'none' // Hide the list if no levels for the building
+      this._levelList.style.display = 'none'
     }
   },
 
@@ -142,8 +199,6 @@ const PlantquestEtageControl = L.Control.extend({
     })
   },
 
-  _levelList: null as HTMLElement | null,
-
   _selectItem: function (item: Building | Level) {
     if (this._map) {
       this._map.setView(item.center, item.zoom)
@@ -159,7 +214,14 @@ const PlantquestEtageControl = L.Control.extend({
 
     // Set the active class to the selected item
     selectedItem.classList.add('plantquest-tool-select-building-active')
+  },
+
+  _logDebug: function(message: string) {
+    if (this.options.debug) {
+      console.log("Debug:", message);
+    }
   }
+  
 })
 
 export { PlantquestEtageControl }
