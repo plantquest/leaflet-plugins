@@ -17,6 +17,7 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 }).addTo(map)
 
 const plantquestGeofenceDisplay = new PlantquestGeofenceDisplay({
+  debug: true,
   geofences: [
     {
       id: 'coffeewerk',
@@ -44,5 +45,10 @@ const plantquestGeofenceDisplay = new PlantquestGeofenceDisplay({
   ],
 })
 
-plantquestGeofenceDisplay.addTo(map)
-// plantquestGeofenceDisplay.remove()
+document.getElementById('addGeofences').addEventListener('click', () => {
+  plantquestGeofenceDisplay.addTo(map)
+})
+
+document.getElementById('removeGeofences').addEventListener('click', () => {
+  plantquestGeofenceDisplay.remove()
+})
