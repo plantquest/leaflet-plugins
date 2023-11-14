@@ -17,7 +17,7 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 //TODO: use GUBU to validate the options
 //TESTING GUBU
-const shapeEtageControlOptions = Gubu({
+const PlantquestEtageControlOptionsShape = Gubu({
   position: String,
   buildings: [
     { id: String, name: String, center: [Number, Number], zoom: Number }
@@ -35,7 +35,7 @@ const shapeEtageControlOptions = Gubu({
 
 // Just some mock-up options for buildings and LEVELS, testing it visually.
 //USING GUBU
-const etageControlOptions = shapeEtageControlOptions({
+const etageControlOptions = PlantquestEtageControlOptionsShape({
   position: 'topright',
   // debug: true,
   buildings: [
@@ -111,3 +111,16 @@ const etageControlOptions = shapeEtageControlOptions({
 const plantquestEtageControl = new PlantquestEtageControl(etageControlOptions)
 
 plantquestEtageControl.addTo(map)
+
+// request: TOGGLE CONTROL VISIBILITY
+const toggleButton = document.getElementById('toggle-control');
+let isControlVisible = true; // initial state
+
+toggleButton.addEventListener('click', () => {
+  if (isControlVisible) {
+    plantquestEtageControl.hide();
+  } else {
+    plantquestEtageControl.show();
+  }
+  isControlVisible = !isControlVisible;
+});
