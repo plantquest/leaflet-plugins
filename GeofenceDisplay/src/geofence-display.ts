@@ -1,10 +1,10 @@
 import L from 'leaflet'
-// import Gubu from 'gubu'
+import { Gubu } from 'gubu'
 import './geofence-display.css'
 // import { RasterCoords } from './rastercoords'
 
 // TODO: implement Gubu with interfaces
-interface Geofence {
+interface GeofenceDef {
   id: string
   title: string
   latlngs: Array<Array<string>>
@@ -13,15 +13,18 @@ interface Geofence {
 
 interface PlantquestGeofenceDisplayOptions extends L.ControlOptions {
   debug: boolean
-  geofences: Geofence[]
+  geofences: GeofenceDef[]
 }
 
 const PlantquestGeofenceDisplay = L.Layer.extend({
-  // Use GUBU for options validation
-  initialize: function (this: any, options: any) {
-    let validatedOptions = options as PlantquestGeofenceDisplayOptions
-    validatedOptions.debug &&
-      console.log('GeofenceDisplay init function called.')
+  initialize: function (
+    this: any,
+    rawOptions: PlantquestGeofenceDisplayOptions
+  ) {
+    const PlantquestGeofenceDisplayOptionsShape = Gubu({})
+    let options = PlantquestGeofenceDisplayOptionsShape(rawOptions)
+    options.debug && console.log('GeofenceDisplay init function called.')
+
     L.Util.setOptions(this, options)
     this._state = {
       zindex: 0,
@@ -37,12 +40,13 @@ const PlantquestGeofenceDisplay = L.Layer.extend({
         'Local geofence variable before add:',
         self._state.geofenceByID
       )
-    self.options.geofences.forEach((fence: any) => {
-      let geo = self.options.geofences[fence]
+
+    self.options.geofences.forEach((geo: any) => {
       let geofence = new Geofence(geo, { map: _map })
       self._state.geofenceByID[geo.id] = geofence
-      geofence.show()
+      self.showGeofence(geofence, true)
     })
+
     self.options.debug &&
       console.log(
         'Local geofence variable after add:',
@@ -59,36 +63,53 @@ const PlantquestGeofenceDisplay = L.Layer.extend({
         'Local geofence variable before remove:',
         self._state.geofenceByID
       )
-    for (let id in self._state.geofenceByID) {
-      self._state.geofenceByID[id].hide()
-      delete self._state.geofenceByID[id]
-    }
+
+    self.clearGeofences()
+
     self.options.debug &&
       console.log(
         'Local geofence variable after remove:',
         self._state.geofenceByID
       )
   },
+
+  showGeofence: function (geofence: Geofence, show: boolean) {
+    if (null == geofence) {
+      return
+    }
+    show = !!show
+    if (true === show) {
+      geofence.show()
+    } else if (false === show) {
+      geofence.hide()
+    }
+  },
+
+  clearGeofences: function () {
+    let self = this
+    for (let geofenceID in self._state.geofenceByID) {
+      let geofence = self._state.geofenceByID[geofenceID]
+      delete self._state.geofenceByID[geofenceID]
+      if (geofence && geofence.hide) {
+        geofence.hide()
+      }
+    }
+  },
 })
 
 class Geofence {
   ent: any = null
   ctx: any = null
-  poly: any = null
+  poly: ReturnType<typeof L.polygon>
 
   constructor(ent: any, ctx: any) {
     this.ent = ent
     this.ctx = ctx
+    this.poly = L.polygon(ent.latlngs, { color: ent.colour })
   }
 
   show() {
     let self = this
-    if (null == self.poly) {
-      let polyCoords = self.ent.latlngs
-      self.poly = L.polygon(polyCoords, {
-        color: self.ent.colour,
-      })
-    }
     self.poly.addTo(self.ctx.map)
   }
 
