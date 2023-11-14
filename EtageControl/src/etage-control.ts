@@ -31,39 +31,57 @@ const PlantquestEtageControl = L.Control.extend({
 
   // Initialize the properties of the class, including the custom ones.
   _map: null as L.Map | null,
-  _buildings: null as Building[] | null,
-  _levels: null as Level[] | null,
+  _buildings: [] as Building[],
+  _levels: [] as Level[],
   _buildingList: null as HTMLElement | null,
   _levelList: null as HTMLElement | null,
+  _container: null as HTMLElement | null,
 
   initialize: function (options: PlantquestEtageControlOptions) {
-    this._logDebug(`Initializing EtageControl with options: ${JSON.stringify(options)}`);
+    this.options.debug && console.log(`Initializing EtageControl with options: ${JSON.stringify(options)}`);
 
     L.Util.setOptions(this, options)
-    this._buildings = options.buildings || []
-    this._levels = options.levels || []
+    this._buildings = Array.isArray(options.buildings) ? options.buildings : []
+    this._levels = Array.isArray(options.levels) ? options.levels : []
   },
 
   onAdd: function (map: L.Map) {
-    this._logDebug(`Adding EtageControl to map: ${map}`);
+    const self = this
+    self.options.debug && console.log(`Adding EtageControl to map: ${map}`);
 
-    this._map = map
+    self._map = map
     const container = L.DomUtil.create('div', 'etage-control-container')
+    self._container = container
     L.DomEvent.disableClickPropagation(container)
 
-    this._initLayout(container)
+    self._initLayout(container)
 
     // Automatically select and highlight the first building and its levels
-    if (this._buildings && this._buildings.length > 0) {
-      const firstBuilding = this._buildings[0]
-      this._selectBuilding(firstBuilding)
+    const firstBuilding = self._buildings[0];
+    if (firstBuilding) {
+      self._selectBuilding(firstBuilding);
     }
 
     return container
   },
 
+  show: function() {
+    if (this._container) {
+      this._container.style.display = '';
+    }
+  },
+
+  // Method to hide the control
+  hide: function() {
+    if (this._container) {
+      this._container.style.display = 'none';
+    }
+  },
+
   onRemove: function (_map: L.Map) {
-    // Nothing to do here
+    if (this._container && this._container.parentNode) {
+      this._container.parentNode.removeChild(this._container);
+    }
   },
 
   _initLayout: function (container: HTMLElement) {
@@ -124,7 +142,7 @@ const PlantquestEtageControl = L.Control.extend({
   },
 
   _selectBuilding: function (building: Building) {
-    this._logDebug(`Selecting building: ${building.id}`);
+    this.options.debug && console.log(`Selecting building: ${building.id}`);
 
     if (this._map) {
       this._map.setView(building.center, building.zoom)
@@ -144,7 +162,7 @@ const PlantquestEtageControl = L.Control.extend({
   },
 
   _updateLevels: function (building_id: string) {
-    this._logDebug(`Updating levels for building: ${building_id}`);
+    this.options.debug && console.log(`Updating levels for building: ${building_id}`);
 
     if (!this._levelList) return
 
@@ -215,12 +233,6 @@ const PlantquestEtageControl = L.Control.extend({
     // Set the active class to the selected item
     selectedItem.classList.add('plantquest-tool-select-building-active')
   },
-
-  _logDebug: function(message: string) {
-    if (this.options.debug) {
-      console.log("Debug:", message);
-    }
-  }
   
 })
 
