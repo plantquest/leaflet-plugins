@@ -1,2 +1,2 @@
-const Leaflet = require('leaflet')
+const Leaflet = require('../GeofenceDisplay/node_modules/leaflet')
 module.exports = Leaflet
