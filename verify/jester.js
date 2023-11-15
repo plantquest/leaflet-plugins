@@ -1,8 +1,3 @@
-// Run: npm run test-web
-
-// A quick and dirty abomination to partially run the unit tests inside an
-// actual browser by simulating some of the Jest API.
-
 const Jester = (window.Jester = {
   exclude: [],
   state: {
@@ -12,7 +7,6 @@ const Jester = (window.Jester = {
   },
 })
 
-// Ensure keys are sorted when JSONified.
 function stringify(o) {
   if (null === o) return 'null'
   if ('symbol' === typeof o) return String(o)
@@ -22,7 +16,7 @@ function stringify(o) {
       .sort()
       .reduce((a, k) => ((a[k] = o[k]), a), {}),
     stringify
-  ) // Recusively!
+  )
 }
 
 function print(s) {
@@ -50,7 +44,6 @@ window.test = function (name, unit) {
 }
 window.expect = function (sval) {
   function pass(cval, ok) {
-    // console.log('pass',cval,ok)
     if (!ok) {
       let state = Jester.state
       state.fail.found = sval
@@ -92,5 +85,3 @@ window.expect = function (sval) {
     },
   }
 }
-
-require('../geofence-display.test.js')
