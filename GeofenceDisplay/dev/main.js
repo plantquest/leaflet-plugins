@@ -16,12 +16,21 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
 }).addTo(map)
 
+map.createPane('geofence')
+let geofencePane = map.getPane('geofence')
+geofencePane.style.zIndex = 230
+
+map.createPane('geofenceLabel')
+let geofenceLabelPane = map.getPane('geofenceLabel')
+geofenceLabelPane.style.zIndex = 235
+
 const plantquestGeofenceDisplay = new PlantquestGeofenceDisplay({
   debug: true,
   geofences: [
     {
       id: 'coffeewerk',
       title: 'Coffewerk+Press',
+      pane: 'geofence',
       latlngs: [
         [53.271455, -9.054129],
         [53.271237, -9.054666],
@@ -34,6 +43,7 @@ const plantquestGeofenceDisplay = new PlantquestGeofenceDisplay({
     {
       id: 'plamas',
       title: 'Plámás',
+      pane: 'geofence',
       latlngs: [
         [53.270467, -9.058356],
         [53.270197, -9.058871],
