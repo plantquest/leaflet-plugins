@@ -1,4 +1,4 @@
-let Leaflet = require('./verify/leaflet.js')
+let Leaflet = require('../../verify/leaflet.js')
 let { PlantquestGeofenceDisplay } = require('../dist/geofence-display.umd.cjs')
 
 describe('GeofenceDisplay', () => {

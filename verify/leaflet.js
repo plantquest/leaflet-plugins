@@ -14513,8 +14513,8 @@
 
 
 },{}],2:[function(require,module,exports){
-const Leaflet = require('leaflet')
+const Leaflet = require('../GeofenceDisplay/node_modules/leaflet')
 module.exports = Leaflet
 
-},{"leaflet":1}]},{},[2])(2)
+},{"../GeofenceDisplay/node_modules/leaflet":1}]},{},[2])(2)
 });

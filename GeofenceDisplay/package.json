@@ -16,8 +16,8 @@
     "dev": "vite dev",
     "watch": "tsc -w & vite dev",
     "build": "tsc && vite build",
-    "test-web": "npm run build-web && browserify -i util -o test/verify/web.js -e test/verify/entry.js -im && see test/verify/web.html",
-    "build-web": "browserify -i util -o test/verify/leaflet.js -e test/verify/leaflet.web.js -s Leaflet -i",
+    "test-web": "npm run build && browserify -i util -o test/web.js -e test/entry.js -im && see test/web.html",
+    "build-web": "browserify -i util -o ../verify/leaflet.js -e ../verify/leaflet.web.js -s Leaflet -i",
     "redev": "npm run build && cd dev/ && npm run dev"
   },
   "author": "Ríona Stokes (https://github.com/rionastokes)",

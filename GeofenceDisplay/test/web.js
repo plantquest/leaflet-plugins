@@ -24784,7 +24784,11 @@ var __publicField = (obj, key, value) => {
 
 
 },{}],3:[function(require,module,exports){
-let Leaflet = require('./verify/leaflet.js')
+require('../../verify/jester.js')
+require('./geofence-display.test.js')
+
+},{"../../verify/jester.js":5,"./geofence-display.test.js":4}],4:[function(require,module,exports){
+let Leaflet = require('../../verify/leaflet.js')
 let { PlantquestGeofenceDisplay } = require('../dist/geofence-display.umd.cjs')
 
 describe('GeofenceDisplay', () => {
@@ -24835,21 +24839,14 @@ describe('GeofenceDisplay', () => {
     expect(plantquestGeofenceDisplay).toBeDefined()
   })
 
-  test('geofence-display-add-geofences', () => {
-    let map = L.map(document.createElement('div'))
-    let plantquestGeofenceDisplay = new PlantquestGeofenceDisplay(options)
-    console.log('before add:', map)
-    plantquestGeofenceDisplay.addTo(map)
-    console.log('after add:', map)
-  })
+  // test('geofence-display-add-geofences', () => {
+  //   let map = L.map(document.createElement('div'))
+  //   let plantquestGeofenceDisplay = new PlantquestGeofenceDisplay(options)
+  //   plantquestGeofenceDisplay.addTo(map)
+  // })
 })
 
-},{"../dist/geofence-display.umd.cjs":1,"./verify/leaflet.js":5}],4:[function(require,module,exports){
-// Run: npm run test-web
-
-// A quick and dirty abomination to partially run the unit tests inside an
-// actual browser by simulating some of the Jest API.
-
+},{"../../verify/leaflet.js":6,"../dist/geofence-display.umd.cjs":1}],5:[function(require,module,exports){
 const Jester = (window.Jester = {
   exclude: [],
   state: {
@@ -24859,7 +24856,6 @@ const Jester = (window.Jester = {
   },
 })
 
-// Ensure keys are sorted when JSONified.
 function stringify(o) {
   if (null === o) return 'null'
   if ('symbol' === typeof o) return String(o)
@@ -24869,7 +24865,7 @@ function stringify(o) {
       .sort()
       .reduce((a, k) => ((a[k] = o[k]), a), {}),
     stringify
-  ) // Recusively!
+  )
 }
 
 function print(s) {
@@ -24897,7 +24893,6 @@ window.test = function (name, unit) {
 }
 window.expect = function (sval) {
   function pass(cval, ok) {
-    // console.log('pass',cval,ok)
     if (!ok) {
       let state = Jester.state
       state.fail.found = sval
@@ -24940,9 +24935,7 @@ window.expect = function (sval) {
   }
 }
 
-require('../geofence-display.test.js')
-
-},{"../geofence-display.test.js":3}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 (function (global){(function (){
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.Leaflet = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 /* @preserve
@@ -39459,11 +39452,11 @@ require('../geofence-display.test.js')
 
 
 },{}],2:[function(require,module,exports){
-const Leaflet = require('leaflet')
+const Leaflet = require('../GeofenceDisplay/node_modules/leaflet')
 module.exports = Leaflet
 
-},{"leaflet":1}]},{},[2])(2)
+},{"../GeofenceDisplay/node_modules/leaflet":1}]},{},[2])(2)
 });
 
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"leaflet":2}]},{},[4]);
+},{"../GeofenceDisplay/node_modules/leaflet":2}]},{},[3]);
