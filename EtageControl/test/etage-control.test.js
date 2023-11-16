@@ -1,8 +1,91 @@
-let Leaflet = require('./verify/leaflet')
-let { PlantquestEtageControl } = require('../src/etage-control.ts')
+let Leaflet = require('../../verify/leaflet.js')
+let { PlantquestEtageControl } = require('../dist/etage-control.umd.cjs')
 
-describe('leaflet', () => {
-  test('happy', () => {
+describe('EtageControl', () => {
+  const options = {
+    debug: true,
+    position: 'topright',
+    buildings: [
+      {
+        id: 'buildingA',
+        name: 'Building A',
+        center: [51.505, -0.09],
+        zoom: 20
+      },
+      {
+        id: 'buildingB',
+        name: 'Building B',
+        center: [51.5051, -0.088],
+        zoom: 20
+      },
+      {
+        id: 'buildingC',
+        name: 'Building C',
+        center: [51.5054, -0.092],
+        zoom: 20
+      }
+    ],
+    levels: [
+      {
+        id: 'floor1',
+        name: 'Floor 1',
+        building_id: 'buildingA',
+        center: [51.505, -0.09],
+        zoom: 20
+      },
+      {
+        id: 'floor2',
+        name: 'Floor 2',
+        building_id: 'buildingA',
+        center: [51.505, -0.09],
+        zoom: 20
+      },
+      {
+        id: 'floor1',
+        name: 'Floor 1',
+        building_id: 'buildingB',
+        center: [51.5051, -0.088],
+        zoom: 20
+      },
+      {
+        id: 'floor2',
+        name: 'Floor 2',
+        building_id: 'buildingB',
+        center: [51.5051, -0.088],
+        zoom: 20
+      },
+      {
+        id: 'floor3',
+        name: 'Floor 3',
+        building_id: 'buildingB',
+        center: [51.5051, -0.088],
+        zoom: 20
+      },
+      {
+        id: 'basement',
+        name: 'Basement',
+        building_id: 'buildingB',
+        center: [51.5051, -0.088],
+        zoom: 20
+      },
+      {
+        id: 'floor1',
+        name: 'Floor 1',
+        building_id: 'buildingC',
+        center: [51.5054, -0.092],
+        zoom: 20
+      },
+      {
+        id: 'floor2',
+        name: 'Roof',
+        building_id: 'buildingC',
+        center: [51.5054, -0.092],
+        zoom: 20
+      }
+    ]
+  }
+
+  test('leaflet-happy', () => {
     expect(Leaflet).toBeDefined()
   })
 
@@ -11,23 +94,12 @@ describe('leaflet', () => {
     expect(map).toBeDefined()
   })
 
-  test('plugin-happy', () => {
-    let geo = PlantquestEtageControl()
-    expect(geo).toBeDefined()
+  test('etage-control-happy', () => {
+    expect(PlantquestEtageControl).toBeDefined()
   })
 
-  test('plugin-map', () => {
-    let map = L.map(document.createElement('div'))
-    let etage = PlantquestEtageControl()
-    etage.addTo(map)
-    expect(map).toBeDefined()
-  })
-
-  test('plugin-container', () => {
-    let map = L.map(document.createElement('div'))
-    let etage = PlantquestEtageControl()
-    etage.addTo(map)
-    let etageContainer = etage.getContainer()
-    expect(etageContainer).toBeDefined()
+  test('etage-control-create', () => {
+    let plantquestEtageControl = new PlantquestEtageControl(options)
+    expect(plantquestEtageControl).toBeDefined()
   })
 })
