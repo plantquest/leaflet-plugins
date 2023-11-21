@@ -1,7 +1,6 @@
 import L from 'leaflet'
 import { Gubu } from 'gubu'
 import './geofence-display.css'
-// import { RasterCoords } from './rastercoords'
 
 // TODO: implement Gubu with interfaces
 interface GeofenceDef {
@@ -42,7 +41,10 @@ const PlantquestGeofenceDisplay = L.Layer.extend({
       )
 
     self.options.geofences.forEach((geo: any) => {
-      let geofence = new Geofence(geo, { map: _map })
+      let geofence = new Geofence(geo, {
+        map: _map,
+        cfg: { geofence: { click: { active: true } } },
+      })
       self._state.geofenceByID[geo.id] = geofence
       self.showGeofence(geofence, true)
     })
@@ -105,11 +107,33 @@ class Geofence {
   constructor(ent: any, ctx: any) {
     this.ent = ent
     this.ctx = ctx
-    this.poly = L.polygon(ent.latlngs, { color: ent.colour })
+    this.poly = L.polygon(ent.latlngs, { pane: ent.pane, color: ent.colour })
   }
 
   show() {
     let self = this
+
+    if (self.ctx.cfg.geofence.click.active) {
+      self.poly.on('click', self.onClick.bind(self))
+    }
+
+    let tooltip = L.tooltip({
+      pane: 'geofenceLabel',
+      permanent: true,
+      direction: 'center',
+      opacity: 1,
+      className: 'polygon-labels',
+    })
+
+    self.poly.bindTooltip(tooltip)
+
+    tooltip.setContent(
+      '<div class="' +
+        'leaflet-zoom-animated ' +
+        'plantquest-geofence-label ' +
+        `">${self.ent.title}</div>`
+    )
+
     self.poly.addTo(self.ctx.map)
   }
 
@@ -118,15 +142,9 @@ class Geofence {
     self.poly && self.poly.remove()
   }
 
-  //   convertPoly(img: any, poly: any) {
-  //     // Quote from docs: 'unproject `coords` to the raster coordinates used by the raster image projection'
-  //     let p = []
-  //     let rc = new RasterCoords(self.map, self.config.mapImg)
-  //     for (let part of poly) {
-  //       p.push(rc.unproject([part[1], part[0]]))
-  //     }
-  //     return p
-  //   }
+  onClick(event: any) {
+    console.log('onClick', event)
+  }
 }
 
 export { PlantquestGeofenceDisplay }
