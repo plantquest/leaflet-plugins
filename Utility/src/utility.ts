@@ -17,10 +17,13 @@ class PlantquestUtility {
     let self = this
     const PlantquestUtilityOptionsShape = Gubu({})
     self.ctx = PlantquestUtilityOptionsShape(rawOptions)
-    self.ctx.debug && console.log('Utility constructor called.')
+    self.ctx.debug && console.log('Utility function constructor called.')
   }
 
   buildContainer() {
+    let self = this
+    self.ctx.debug && console.log('Utility function buildContainer called.')
+
     let html = `
   <div id="plantquest-assetmap-map" class="plantquest-assetmap-vis"></div>
 `
@@ -28,12 +31,21 @@ class PlantquestUtility {
   }
 
   fixid(idstr: any) {
+    let self = this
+    self.ctx.debug && console.log('Utility function fixid called.')
+
     return idstr.replace(/[ \t]/g, '-')
   }
 
-  clear() {}
+  clear() {
+    let self = this
+    self.ctx.debug && console.log('Utility function clear called.')
+  }
 
   clone(obj: any) {
+    let self = this
+    self.ctx.debug && console.log('Utility function clone called.')
+
     if (null != obj && 'object' === typeof obj) {
       return JSON.parse(JSON.stringify(obj))
     }
@@ -45,14 +57,20 @@ class PlantquestUtility {
   // See https://github.com/substack/point-in-polygon
 
   pointInPolygon(point: any, vs: any, start: any, end: any) {
+    let self = this
+    self.ctx.debug && console.log('Utility function pointInPolygon called.')
+
     if (vs.length > 0 && Array.isArray(vs[0])) {
-      return this.pointInPolygonNested(point, vs, start, end)
+      return self.pointInPolygonNested(point, vs, start, end)
     } else {
-      return this.pointInPolygonFlat(point, vs, start, end)
+      return self.pointInPolygonFlat(point, vs, start, end)
     }
   }
 
   pointInPolygonFlat(point: any, vs: any, start: any, end: any) {
+    let self = this
+    self.ctx.debug && console.log('Utility function pointInPolygonFlat called.')
+
     let x = point[0],
       y = point[1]
     let inside = false
@@ -72,6 +90,10 @@ class PlantquestUtility {
   }
 
   pointInPolygonNested(point: any, vs: any, start: any, end: any) {
+    let self = this
+    self.ctx.debug &&
+      console.log('Utility function pointInPolygonNested called.')
+
     let x = point[0],
       y = point[1]
     let inside = false
@@ -93,6 +115,9 @@ class PlantquestUtility {
   // utility functions
   // transform poly coords for tilesets
   convertPoly(poly: any) {
+    let self = this
+    self.ctx.debug && console.log('Utility function convertPoly called.')
+
     let p = []
     let rc = new RasterCoords({ map: null, imgsize: null })
     for (let part of poly) {
@@ -102,6 +127,9 @@ class PlantquestUtility {
   }
 
   convertRoomPoly(img: any, poly: any) {
+    let self = this
+    self.ctx.debug && console.log('Utility function convertRoomPoly called.')
+
     // console.log('CRP', img[1])
     let p = []
     let rc = new RasterCoords({ map: null, imgsize: null })
@@ -112,6 +140,9 @@ class PlantquestUtility {
   }
 
   convert_latlng(latlng: any) {
+    let self = this
+    self.ctx.debug && console.log('Utility function convert_latlng called.')
+
     let rc = new RasterCoords({ map: null, imgsize: null })
     let Lng = rc.project(latlng)
     return {
@@ -121,15 +152,24 @@ class PlantquestUtility {
   }
 
   convert_poly_y(img: any, y: any) {
+    let self = this
+    self.ctx.debug && console.log('Utility function convert_poly_y called.')
+
     return img[1] - y
   }
 
   c_asset_coords(x: any, y: any) {
+    let self = this
+    self.ctx.debug && console.log('Utility function c_asset_coords called.')
+
     let rc = new RasterCoords({ map: null, imgsize: null })
     return rc.unproject([x, y])
   }
 
   make_parent_key(relate: any, asset: any) {
+    let self = this
+    self.ctx.debug && console.log('Utility function make_parent_key called.')
+
     return relate.p
       .split(/~/g)
       .map((pn: any) => asset[pn])
@@ -137,17 +177,26 @@ class PlantquestUtility {
   }
 
   make_parent_val(relate: any, asset: any) {
+    let self = this
+    self.ctx.debug && console.log('Utility function make_parent_val called.')
+
     return relate.p
       .split(/~/g)
       .reduce((a: any, pn: any) => ((a[pn] = asset[pn]), a), {})
   }
 
   make_child_id(relate: any, asset: any) {
+    let self = this
+    self.ctx.debug && console.log('Utility function make_child_id called.')
+
     // let ccol = 'asset' === relate.c ? 'tag' : relate.c
     return asset[relate.c]
   }
 
   insert_child(arr: any, child: any) {
+    let self = this
+    self.ctx.debug && console.log('Utility function insert_child called.')
+
     if (arr instanceof Array) {
       for (let i = 0; i < arr.length; i++) {
         // ( ('~'+arr[i]) == ('~'+child) )
@@ -165,6 +214,9 @@ class PlantquestUtility {
   }
 
   injectStyle() {
+    let self = this
+    self.ctx.debug && console.log('Utility function injectStyle called.')
+
     // head = document.head
     // const head = $('head')
     const style = document.createElement('style')
