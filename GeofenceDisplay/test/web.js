@@ -10193,7 +10193,10 @@ var __publicField = (obj, key, value) => {
         self2._state.geofenceByID
       );
       self2.options.geofences.forEach((geo) => {
-        let geofence = new Geofence(geo, { map: _map });
+        let geofence = new Geofence(geo, {
+          map: _map,
+          cfg: { geofence: { click: { active: true } } }
+        });
         self2._state.geofenceByID[geo.id] = geofence;
         self2.showGeofence(geofence, true);
       });
@@ -10244,25 +10247,33 @@ var __publicField = (obj, key, value) => {
       __publicField(this, "poly");
       this.ent = ent;
       this.ctx = ctx;
-      this.poly = L$1.polygon(ent.latlngs, { color: ent.colour });
+      this.poly = L$1.polygon(ent.latlngs, { pane: ent.pane, color: ent.colour });
     }
     show() {
       let self2 = this;
+      if (self2.ctx.cfg.geofence.click.active) {
+        self2.poly.on("click", self2.onClick.bind(self2));
+      }
+      let tooltip = L$1.tooltip({
+        pane: "geofenceLabel",
+        permanent: true,
+        direction: "center",
+        opacity: 1,
+        className: "polygon-labels"
+      });
+      self2.poly.bindTooltip(tooltip);
+      tooltip.setContent(
+        `<div class="leaflet-zoom-animated plantquest-geofence-label ">${self2.ent.title}</div>`
+      );
       self2.poly.addTo(self2.ctx.map);
     }
     hide() {
       let self2 = this;
       self2.poly && self2.poly.remove();
     }
-    //   convertPoly(img: any, poly: any) {
-    //     // Quote from docs: 'unproject `coords` to the raster coordinates used by the raster image projection'
-    //     let p = []
-    //     let rc = new RasterCoords(self.map, self.config.mapImg)
-    //     for (let part of poly) {
-    //       p.push(rc.unproject([part[1], part[0]]))
-    //     }
-    //     return p
-    //   }
+    onClick(event) {
+      console.log("onClick", event);
+    }
   }
   exports2.PlantquestGeofenceDisplay = PlantquestGeofenceDisplay;
   Object.defineProperty(exports2, Symbol.toStringTag, { value: "Module" });
@@ -24793,7 +24804,7 @@ let { PlantquestGeofenceDisplay } = require('../dist/geofence-display.umd.cjs')
 
 describe('GeofenceDisplay', () => {
   const options = {
-    debug: true,
+    debug: false,
     geofences: [
       {
         id: 'coffeewerk',
@@ -24825,9 +24836,31 @@ describe('GeofenceDisplay', () => {
     expect(Leaflet).toBeDefined()
   })
 
-  test('leaflet-map', () => {
-    let map = L.map(document.createElement('div'))
-    expect(map).toBeDefined()
+  test('leaflet-map-happy', () => {
+    let map1 = L.map(document.createElement('div'))
+    expect(map1).toBeDefined()
+  })
+
+  test('leaflet-map-prep', () => {
+    let map2 = L.map(document.createElement('div'))
+    map2.setView([53.27, -9.055], 16)
+
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution:
+        '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    }).addTo(map2)
+
+    map2.createPane('geofence')
+    let geofencePane1 = map2.getPane('geofence')
+    geofencePane1.style.zIndex = 230
+
+    map2.createPane('geofenceLabel')
+    let geofenceLabelPane1 = map2.getPane('geofenceLabel')
+    geofenceLabelPane1.style.zIndex = 235
+
+    expect(map2._panes.geofence).toBeDefined()
+    expect(map2._panes.geofenceLabel).toBeDefined()
   })
 
   test('geofence-display-happy', () => {
@@ -24835,15 +24868,58 @@ describe('GeofenceDisplay', () => {
   })
 
   test('geofence-display-create', () => {
-    let plantquestGeofenceDisplay = new PlantquestGeofenceDisplay(options)
-    expect(plantquestGeofenceDisplay).toBeDefined()
+    let plantquestGeofenceDisplay1 = new PlantquestGeofenceDisplay(options)
+    expect(plantquestGeofenceDisplay1._state).toBeDefined()
   })
 
-  // test('geofence-display-add-geofences', () => {
-  //   let map = L.map(document.createElement('div'))
-  //   let plantquestGeofenceDisplay = new PlantquestGeofenceDisplay(options)
-  //   plantquestGeofenceDisplay.addTo(map)
-  // })
+  test('geofence-display-add-geofences', () => {
+    let map3 = L.map(document.createElement('div'))
+    map3.setView([53.27, -9.055], 16)
+
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution:
+        '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    }).addTo(map3)
+
+    map3.createPane('geofence')
+    let geofencePane2 = map3.getPane('geofence')
+    geofencePane2.style.zIndex = 230
+
+    map3.createPane('geofenceLabel')
+    let geofenceLabelPane2 = map3.getPane('geofenceLabel')
+    geofenceLabelPane2.style.zIndex = 235
+
+    let plantquestGeofenceDisplay2 = new PlantquestGeofenceDisplay(options)
+    expect(plantquestGeofenceDisplay2._map).toBeUndefined()
+    plantquestGeofenceDisplay2.addTo(map3)
+    expect(plantquestGeofenceDisplay2._map).toBeDefined()
+  })
+
+  test('geofence-display-remove-geofences', () => {
+    let map4 = L.map(document.createElement('div'))
+    map4.setView([53.27, -9.055], 16)
+
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution:
+        '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    }).addTo(map4)
+
+    map4.createPane('geofence')
+    let geofencePane3 = map4.getPane('geofence')
+    geofencePane3.style.zIndex = 230
+
+    map4.createPane('geofenceLabel')
+    let geofenceLabelPane3 = map4.getPane('geofenceLabel')
+    geofenceLabelPane3.style.zIndex = 235
+
+    let plantquestGeofenceDisplay3 = new PlantquestGeofenceDisplay(options)
+    plantquestGeofenceDisplay3.addTo(map4)
+    expect(plantquestGeofenceDisplay3._map).toBeDefined()
+    plantquestGeofenceDisplay3.remove()
+    expect(plantquestGeofenceDisplay3._map).toEqual(null)
+  })
 })
 
 },{"../../verify/leaflet.js":6,"../dist/geofence-display.umd.cjs":1}],5:[function(require,module,exports){
