@@ -59,7 +59,6 @@ const DataLoader = L.Control.extend({
     let processedData = this.generate({
       assets: this._data.asset || [],
       rooms: this._data.room || [],
-      // Include other entities as needed
     });
 
     this._data = processedData;
