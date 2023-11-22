@@ -1,4 +1,7 @@
 import { DataLoader } from '@plantquest/data-loader';
+// importing seneca for testing, as we have to receive/passthrough seneca instance
+import Seneca from 'seneca-browser'
+
 
 const map = L.map('map').setView([51.505, -0.09], 13);
 const dataLoader = new DataLoader({
@@ -7,7 +10,7 @@ const dataLoader = new DataLoader({
     plant_id: 'plant_id',
     stage: 'stage'
   },
-  senecaPostFunction: SenecaPostFunction, // TODO: SENECA INTEGGRATION
+  seneca: Seneca, // TODO: SENECA INTEGGRATION - Testing
   entityNames: ['building', 'level', 'room', 'geofence', 'asset']
 });
 
