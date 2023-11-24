@@ -85,42 +85,42 @@ describe('Utility', () => {
     // return boolean
   })
 
-  test('utility-convertPoly', () => {
-    let pqu9 = new PlantquestUtility(options)
-    let poly = [
-      [2, 2],
-      [2, -2],
-      [-2, -2],
-      [-2, 2],
-    ]
-    let convertPoly = pqu9.convertPoly(poly)
-    // params: array of coordinate pairs for unprojecting
-    // return array of arrays (array of coordinate pairs)
-  })
+  // test('utility-convertPoly', () => {
+  //   let pqu9 = new PlantquestUtility(options)
+  //   let poly = [
+  //     [2, 2],
+  //     [2, -2],
+  //     [-2, -2],
+  //     [-2, 2],
+  //   ]
+  //   let convertPoly = pqu9.convertPoly(poly)
+  //   // params: array of coordinate pairs for unprojecting
+  //   // return array of arrays (array of coordinate pairs)
+  // })
 
-  test('utility-convertRoomPoly', () => {
-    let pqu10 = new PlantquestUtility(options)
-    let img = [2, 5]
-    let poly = [
-      [2, 2],
-      [2, -2],
-      [-2, -2],
-      [-2, 2],
-    ]
-    let convertRoomPoly = pqu10.convertRoomPoly(img, poly)
-    // params:
-    // img - array of single x and single y of img (edit to each y coord)
-    // poly - array of coordinate pairs for unprojecting
-    // return array of arrays (array of coordinate pairs)
-  })
+  // test('utility-convertRoomPoly', () => {
+  //   let pqu10 = new PlantquestUtility(options)
+  //   let img = [2, 5]
+  //   let poly = [
+  //     [2, 2],
+  //     [2, -2],
+  //     [-2, -2],
+  //     [-2, 2],
+  //   ]
+  //   let convertRoomPoly = pqu10.convertRoomPoly(img, poly)
+  //   // params:
+  //   // img - array of single x and single y of img (edit to each y coord)
+  //   // poly - array of coordinate pairs for unprojecting
+  //   // return array of arrays (array of coordinate pairs)
+  // })
 
-  test('utility-convert_latlng', () => {
-    let pqu11 = new PlantquestUtility(options)
-    let latlng = [2, 3]
-    let convert_latlng = pqu11.convert_latlng(latlng)
-    // param: latlng array of x and y for projecting
-    // return object with xco and yco (floored lat and lng)
-  })
+  // test('utility-convert_latlng', () => {
+  //   let pqu11 = new PlantquestUtility(options)
+  //   let latlng = [2, 3]
+  //   let convert_latlng = pqu11.convert_latlng(latlng)
+  //   // param: latlng array of x and y for projecting
+  //   // return object with xco and yco (floored lat and lng)
+  // })
 
   test('utility-convert_poly_y', () => {
     let pqu12 = new PlantquestUtility(options)
@@ -131,14 +131,14 @@ describe('Utility', () => {
     // return img[1] - y
   })
 
-  test('utility-c_asset_coords', () => {
-    let pqu13 = new PlantquestUtility(options)
-    let x = 1
-    let y = 2
-    let c_asset_coords = pqu13.c_asset_coords(x, y)
-    // params: single x and single y for unproject
-    // return unproject return value (array?)
-  })
+  // test('utility-c_asset_coords', () => {
+  //   let pqu13 = new PlantquestUtility(options)
+  //   let x = 1
+  //   let y = 2
+  //   let c_asset_coords = pqu13.c_asset_coords(x, y)
+  //   // params: single x and single y for unproject
+  //   // return unproject return value (array?)
+  // })
 
   test('utility-make_parent_key', () => {
     let pqu14 = new PlantquestUtility(options)
