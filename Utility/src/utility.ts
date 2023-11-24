@@ -13,7 +13,8 @@ class PlantquestUtility {
   ent: any = null
   ctx: any = null
 
-  constructor(ctx: any, rawOptions: PlantquestUtilityOptions) {
+  constructor(rawOptions: PlantquestUtilityOptions) {
+    // include ctx: any in constructor
     // ctx.pqam.map = [pqam] self.map
     let self = this
     const PlantquestUtilityOptionsShape = Gubu({})
