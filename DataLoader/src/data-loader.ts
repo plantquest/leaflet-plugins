@@ -1,5 +1,4 @@
 import L from 'leaflet';
-import './data-loader.css';
 
 interface DataLoaderOptions extends L.ControlOptions {
   query: any; // Define the structure of your query object
@@ -169,15 +168,6 @@ const DataLoader = L.Control.extend({
     } else if (arr instanceof Set) {
       arr.add(child);
     }
-  },
-
-  onAdd: function (_map: L.Map) {
-    // TODO: Do we need to do anything here?
-    // Like add a loading indicator?
-  },
-
-  onRemove: function (_map: L.Map) {
-    // Clean up if needed
   },
 
 });
