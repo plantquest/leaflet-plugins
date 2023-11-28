@@ -7,13 +7,15 @@ import '@plantquest/etage-control/dist/etage-control.css'
 import { PlantquestEtageControl } from '@plantquest/etage-control'
 import { Gubu } from 'gubu'
 
-const map = L.map('map').setView([51.505, -0.09], 20)
+const map = L.map('plantquest-assetmap-map', {
+  crs: L.CRS.Simple,
+  scrollWheelZoom: false,
+  doubleClickZoom: false,
+  attributionControl: false,
+  editable: true,
+})
 
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  maxZoom: 19,
-  attribution:
-    '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-}).addTo(map)
+L.tileLayer('https://plantquest-demo01-map01.s3.eu-west-1.amazonaws.com/tiles/pqd-pq01-m01-013').addTo(map)
 
 //TODO: use GUBU to validate the options
 //TESTING GUBU
@@ -37,7 +39,7 @@ const PlantquestEtageControlOptionsShape = Gubu({
 //USING GUBU
 const etageControlOptions = PlantquestEtageControlOptionsShape({
   position: 'topright',
-  // debug: true,
+  debug: false,
   buildings: [
     { id: 'buildingA', name: 'Building A', center: [51.505, -0.09], zoom: 20 },
     {
@@ -113,14 +115,14 @@ const plantquestEtageControl = new PlantquestEtageControl(etageControlOptions)
 plantquestEtageControl.addTo(map)
 
 // request: TOGGLE CONTROL VISIBILITY
-const toggleButton = document.getElementById('toggle-control');
-let isControlVisible = true; // initial state
+const toggleButton = document.getElementById('toggle-control')
+let isControlVisible = true // initial state
 
 toggleButton.addEventListener('click', () => {
   if (isControlVisible) {
-    plantquestEtageControl.hide();
+    plantquestEtageControl.hide()
   } else {
-    plantquestEtageControl.show();
+    plantquestEtageControl.show()
   }
-  isControlVisible = !isControlVisible;
-});
+  isControlVisible = !isControlVisible
+})
