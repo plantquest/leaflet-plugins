@@ -5,24 +5,10 @@ import L from 'leaflet'
 
 import '@plantquest/geofence-display/dist/geofence-display.css'
 import { PlantquestGeofenceDisplay } from '@plantquest/geofence-display'
-// import '../src/rastercoords'
 
 console.log('START', PlantquestGeofenceDisplay)
-// console.log('START')
-
-// const map = L.map('map').setView([53.27, -9.055], 16)
-// L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-//   maxZoom: 19,
-//   attribution:
-//     '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-// }).addTo(map)
 
 const map = L.map('map', {
-  // crs: L.CRS.Simple,
-  // scrollWheelZoom: false,
-  // doubleClickZoom: false,
-  // attributionControl: false,
-  // editable: true,
   minZoom: 1.7,
 }).setView([50.154377, 2154.375], 1.7)
 
