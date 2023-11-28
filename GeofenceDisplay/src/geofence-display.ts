@@ -117,11 +117,12 @@ class Geofence {
       self.poly.on('click', self.onClick.bind(self))
     }
 
+    // TODO: tooltip options passed into plugin
     let tooltip = L.tooltip({
       pane: 'geofenceLabel',
       permanent: true,
-      direction: 'center',
-      opacity: 1,
+      direction: 'bottom',
+      opacity: 0.8,
       className: 'polygon-labels',
     })
 
