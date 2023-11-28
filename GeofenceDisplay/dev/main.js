@@ -5,49 +5,29 @@ import L from 'leaflet'
 
 import '@plantquest/geofence-display/dist/geofence-display.css'
 import { PlantquestGeofenceDisplay } from '@plantquest/geofence-display'
+// import '../src/rastercoords'
 
 console.log('START', PlantquestGeofenceDisplay)
+// console.log('START')
 
 // const map = L.map('map').setView([53.27, -9.055], 16)
-
-//
-
-const map = L.map('plantquest-assetmap-map', {
-  crs: L.CRS.Simple,
-  scrollWheelZoom: false,
-  doubleClickZoom: false,
-  attributionControl: false,
-  // minZoom: self.config.mapMinZoom,
-  // maxZoom: self.config.mapMaxZoom,
-  editable: true,
-})
-
-// rc = self.rc = new L.RasterCoords(self.map, self.config.mapImg)
-// self.map.setMaxBounds(self.rc.getMaxBounds())
-
-// self.leaflet.maptile = self.createTile(mapIndex+1)
-// self.leaflet.maptile.addTo(self.map)
-
-// self.createTile = function(mapIndex) {
-// let tileLyr =
-//   L.tileLayer('https://plantquest-demo01-map01.s3.eu-west-1.amazonaws.com/tiles/pqd-pq01-m01-013', {
-//     bounds: self.rc.getMaxBounds(),
-//     minZoom: self.config.mapMinZoom,
-//     maxZoom: self.config.mapMaxZoom,
-//   })
-// return tileLyr
-// },
-
-//
-
 // L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 //   maxZoom: 19,
 //   attribution:
 //     '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
 // }).addTo(map)
 
+const map = L.map('map', {
+  // crs: L.CRS.Simple,
+  // scrollWheelZoom: false,
+  // doubleClickZoom: false,
+  // attributionControl: false,
+  // editable: true,
+  minZoom: 1.7,
+}).setView([50.154377, 2154.375], 1.7)
+
 L.tileLayer(
-  'https://plantquest-demo01-map01.s3.eu-west-1.amazonaws.com/tiles/pqd-pq01-m01-013'
+  'https://plantquest-demo01-map01.s3.eu-west-1.amazonaws.com/tiles/pqd-pq01-m01-013/{z}/{x}/{y}.png'
 ).addTo(map)
 
 map.createPane('geofence')
@@ -62,29 +42,42 @@ const plantquestGeofenceDisplay = new PlantquestGeofenceDisplay({
   debug: true,
   geofences: [
     {
-      id: 'coffeewerk',
-      title: 'Coffewerk+Press',
+      id: 'buildingA',
+      title: 'Building A',
       pane: 'geofence',
       latlngs: [
-        [53.271455, -9.054129],
-        [53.271237, -9.054666],
-        [53.271096, -9.054494],
-        [53.270852, -9.054365],
-        [53.271404, -9.053936],
+        [53.138881, 2086.226563],
+        [53.138881, 2116],
+        [47.135928, 2116],
+        [47.135928, 2086.226563],
       ],
-      colour: 'purple',
+      colour: 'blue',
     },
     {
-      id: 'plamas',
-      title: 'Plámás',
+      id: 'buildingB',
+      title: 'Building B',
       pane: 'geofence',
       latlngs: [
-        [53.270467, -9.058356],
-        [53.270197, -9.058871],
-        [53.270095, -9.058142],
-        [53.270172, -9.057584],
+        [60.309538, 2234.9375],
+        [60.309538, 2255.273438],
+        [58.52124, 2255.273438],
+        [58.52124, 2252.109375],
+        [56.248232, 2252.109375],
+        [56.248232, 2234.9375],
       ],
-      colour: 'purple',
+      colour: 'blue',
+    },
+    {
+      id: 'buildingC',
+      title: 'Building C',
+      pane: 'geofence',
+      latlngs: [
+        [3.653769, 2155.78125],
+        [3.653769, 2173.007813],
+        [-2.670909, 2173.007813],
+        [-2.670909, 2155.78125],
+      ],
+      colour: 'blue',
     },
   ],
 })
