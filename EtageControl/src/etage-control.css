@@ -60,6 +60,10 @@
   text-decoration: none;
 }
 
+.leaflet-container {
+  background-color: #c9d486
+}
+
 a:-webkit-any-link {
   text-decoration: none;
 }
