@@ -22,6 +22,7 @@ interface PlantquestEtageControlOptions extends L.ControlOptions {
   buildings?: Building[]
   levels?: Level[]
   debug?: boolean
+  tileLayer?: L.TileLayer
 }
 
 const PlantquestEtageControl = L.Control.extend({
@@ -36,6 +37,7 @@ const PlantquestEtageControl = L.Control.extend({
   _buildingList: null as HTMLElement | null,
   _levelList: null as HTMLElement | null,
   _container: null as HTMLElement | null,
+  _tileLayer: undefined as L.TileLayer | undefined,
 
   initialize: function (options: PlantquestEtageControlOptions) {
     this.options.debug && console.log(`Initializing EtageControl with options: ${JSON.stringify(options)}`);
@@ -43,6 +45,7 @@ const PlantquestEtageControl = L.Control.extend({
     L.Util.setOptions(this, options)
     this._buildings = Array.isArray(options.buildings) ? options.buildings : []
     this._levels = Array.isArray(options.levels) ? options.levels : []
+    this._tileLayer = options.tileLayer; // Store the tile layer reference
   },
 
   onAdd: function (map: L.Map) {
@@ -219,7 +222,21 @@ const PlantquestEtageControl = L.Control.extend({
 
   _selectItem: function (item: Building | Level) {
     if (this._map) {
-      this._map.setView(item.center, item.zoom)
+      this._map.setView(item.center, item.zoom);
+    }
+
+    if ('building_id' in item) {
+      let newUrl = '';
+      switch (item.name) {
+        case 'First Floor':
+          newUrl = 'https://plantquest-demo01-map01.s3.eu-west-1.amazonaws.com/tiles/pqd-pq01-m01-013/{z}/{x}/{y}.png';
+          break;
+        case 'Second Floor':
+          newUrl = 'https://plantquest-demo01-map01.s3.eu-west-1.amazonaws.com/tiles/pqd-pq01-m02-013/{z}/{x}/{y}.png';
+          break;
+        // Add more cases as needed
+      }
+      this._tileLayer && this._tileLayer.setUrl(newUrl);
     }
   },
 
