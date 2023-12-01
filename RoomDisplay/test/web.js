@@ -24769,12 +24769,12 @@ var __publicField = (obj, key, value) => {
       let self2 = this;
       self2.options.debug && console.log("RoomDisplay onAdd function called.");
       self2.options.debug && console.log("Local room variable before add:", self2._state.roomByID);
-      self2.options.rooms.forEach((geo) => {
-        let room = new Room(geo, {
+      self2.options.rooms.forEach((roo) => {
+        let room = new Room(roo, {
           map: _map,
-          cfg: { room: { click: { active: true } } }
+          cfg: { room: { color: "purple", click: { active: true } } }
         });
-        self2._state.roomByID[geo.id] = room;
+        self2._state.roomByID[roo.id] = room;
         self2.showRoom(room, true);
       });
       self2.options.debug && console.log("Local room variable after add:", self2._state.roomByID);
@@ -24792,7 +24792,7 @@ var __publicField = (obj, key, value) => {
       }
       show = !!show;
       if (true === show) {
-        room.show(null, null);
+        room.show();
       } else if (false === show) {
         room.hide();
       }
@@ -24812,28 +24812,27 @@ var __publicField = (obj, key, value) => {
     constructor(ent, ctx) {
       __publicField(this, "ent", null);
       __publicField(this, "ctx", null);
-      __publicField(this, "poly", null);
+      __publicField(this, "poly");
       __publicField(this, "cfgroom", null);
       __publicField(this, "label", null);
       this.ent = ent;
       this.ctx = ctx;
       this.cfgroom = ctx.cfg.room;
+      this.poly = L$1.polygon(ent.room_poly, {
+        pane: ent.pane,
+        color: this.cfgroom.color
+      });
     }
-    show(layer, room_poly) {
+    show() {
       let self2 = this;
-      if (null == self2.poly) {
-        self2.poly = L$1.polygon(room_poly, {
-          pane: "room",
-          color: self2.cfgroom.color
-        });
-        if (self2.cfgroom.click.active) {
-          self2.poly.on("click", self2.onClick.bind(self2));
-        }
+      if (self2.cfgroom.click.active) {
+        self2.poly.on("click", self2.onClick.bind(self2));
       }
-      self2.poly.addTo(layer);
-      return self2.poly;
+      self2.poly.addTo(self2.ctx.map);
     }
     hide() {
+      let self2 = this;
+      self2.poly && self2.poly.remove();
     }
     focus(room) {
       let self2 = this;
@@ -24853,98 +24852,108 @@ var __publicField = (obj, key, value) => {
       pqam.map.setView(roompos, pqam.config.mapRoomFocusZoom);
       return roomlatlng;
     }
-    select(roomId, opts) {
-      let self2 = this;
-      opts = opts || {};
-      let pqam = self2.ctx.pqam;
-      try {
-        let room = pqam.data.roomMap[roomId];
-        let isChosen = pqam.loc.chosen.room && roomId === pqam.loc.chosen.room.room;
-        if (null == pqam.data.roomMap[roomId] || isChosen) {
-          self2.focus(pqam.loc.chosen.room);
-          return;
-        }
-        pqam.log("selectRoom", roomId, room);
-        if (pqam.loc.poly) {
-          pqam.loc.poly.remove(pqam.layer.room);
-          pqam.loc.poly = null;
-        }
-        pqam.loc.room = null;
-        if (pqam.loc.chosen.poly && room !== pqam.loc.chosen.room) {
-          pqam.loc.chosen.poly.remove(pqam.layer.room);
-          pqam.loc.chosen.poly = null;
-        }
-        if (pqam.loc.popup) {
-          pqam.loc.popup.remove(pqam.map);
-          pqam.loc.popop = null;
-        }
-        pqam.loc.chosen.room = room;
-        let room_poly = self2.convertRoomPoly(pqam.config.mapImg, room.poly);
-        pqam.loc.chosen.poly = L$1.polygon(room_poly, {
-          pane: "room",
-          color: pqam.config.room.color
-        });
-        pqam.loc.chosen.poly.on("click", () => self2.select(room.room));
-        pqam.loc.chosen.poly.addTo(pqam.layer.room);
-        let roomlatlng = self2.focus(room);
-        let roompos_y = self2.convert_poly_y(pqam.config.mapImg, roomlatlng[0]);
-        let roompos_x = roomlatlng[1];
-        let roompos = self2.c_asset_coords(roompos_y - 4, roompos_x + 5);
-        pqam.loc.popup = L$1.popup({
-          autoClose: false,
-          closeOnClick: false
-        }).setLatLng(roompos).setContent(pqam.roomPopup(pqam.loc.chosen.room)).openOn(pqam.map);
-        if (!opts.mute) {
-          pqam.click({ select: "room", room: pqam.loc.chosen.room.room });
-        }
-      } catch (e) {
-        pqam.log("ERROR", "selectRoom", "1010", roomId, e.message, e);
-      }
-    }
-    onZoom(zoom, mapID, layer) {
-      let self2 = this;
-      let mapMatch = 1 + parseInt(mapID) == parseInt(self2.ent.map);
-      let showRoomLabel = 1 === parseInt(self2.ent.showlabel);
-      let showNameZoom = null == self2.cfgroom.label.zoom ? self2.ctx.cfg.mapMaxZoom : self2.cfgroom.label.zoom;
-      let showLabel = showNameZoom <= zoom && mapMatch && showRoomLabel;
-      let shown = false;
-      if (showLabel) {
-        if (null == self2.label && self2.ent.poly) {
-          self2.label = L$1.polygon(
-            self2.convertRoomPoly(self2.ctx.cfg.mapImg, self2.ent.poly),
-            {
-              color: "transparent",
-              pane: "roomLabel",
-              interactive: false
-            }
-          );
-          self2.label.name$ = "ROOM:" + self2.ent.name;
-          let tooltip = L$1.tooltip({
-            permanent: true,
-            direction: "center",
-            opacity: 1,
-            className: "polygon-labels"
-          });
-          tooltip.setContent(
-            `<div class="xleaflet-zoom-animated plantquest-room-label ">${self2.ent.name}</div>`
-          );
-          self2.label.bindTooltip(tooltip);
-        }
-        if (layer) {
-          self2.label.addTo(layer);
-          shown = true;
-        }
-      } else {
-        if (null != self2.label) {
-          self2.label.remove();
-        }
-      }
-      return shown;
-    }
+    // select(roomId: any, opts?: any) {
+    //   let self = this
+    //   opts = opts || {}
+    //   let pqam = self.ctx.pqam
+    //   try {
+    //     let room = pqam.data.roomMap[roomId]
+    //     let isChosen =
+    //       pqam.loc.chosen.room && roomId === pqam.loc.chosen.room.room
+    //     if (null == pqam.data.roomMap[roomId] || isChosen) {
+    //       self.focus(pqam.loc.chosen.room)
+    //       return
+    //     }
+    //     pqam.log('selectRoom', roomId, room)
+    //     if (pqam.loc.poly) {
+    //       pqam.loc.poly.remove(pqam.layer.room)
+    //       pqam.loc.poly = null
+    //     }
+    //     pqam.loc.room = null
+    //     if (pqam.loc.chosen.poly && room !== pqam.loc.chosen.room) {
+    //       pqam.loc.chosen.poly.remove(pqam.layer.room)
+    //       pqam.loc.chosen.poly = null
+    //     }
+    //     if (pqam.loc.popup) {
+    //       pqam.loc.popup.remove(pqam.map)
+    //       pqam.loc.popop = null
+    //     }
+    //     pqam.loc.chosen.room = room
+    //     let room_poly = self.convertRoomPoly(pqam.config.mapImg, room.poly)
+    //     pqam.loc.chosen.poly = L.polygon(room_poly, {
+    //       pane: 'room',
+    //       color: pqam.config.room.color,
+    //     })
+    //     pqam.loc.chosen.poly.on('click', () => self.select(room.room))
+    //     pqam.loc.chosen.poly.addTo(pqam.layer.room)
+    //     let roomlatlng: any = self.focus(room)
+    //     // convert for popup
+    //     let roompos_y = self.convert_poly_y(pqam.config.mapImg, roomlatlng[0])
+    //     let roompos_x = roomlatlng[1]
+    //     let roompos = self.c_asset_coords(roompos_y - 4, roompos_x + 5)
+    //     // map focus on room selection
+    //     pqam.loc.popup = L.popup({
+    //       autoClose: false,
+    //       closeOnClick: false,
+    //     })
+    //       .setLatLng(roompos)
+    //       .setContent(pqam.roomPopup(pqam.loc.chosen.room))
+    //       .openOn(pqam.map)
+    //     if (!opts.mute) {
+    //       pqam.click({ select: 'room', room: pqam.loc.chosen.room.room })
+    //     }
+    //   } catch (e: any) {
+    //     pqam.log('ERROR', 'selectRoom', '1010', roomId, e.message, e)
+    //   }
+    // }
+    // onZoom(zoom: any, mapID: any, layer: any) {
+    //   let self = this
+    //   let mapMatch = 1 + parseInt(mapID) == parseInt(self.ent.map)
+    //   let showRoomLabel = 1 === parseInt(self.ent.showlabel)
+    //   let showNameZoom =
+    //     null == self.cfgroom.label.zoom
+    //       ? self.ctx.cfg.mapMaxZoom
+    //       : self.cfgroom.label.zoom
+    //   let showLabel = showNameZoom <= zoom && mapMatch && showRoomLabel
+    //   let shown = false
+    //   if (showLabel) {
+    //     if (null == self.label && self.ent.poly) {
+    //       self.label = L.polygon(
+    //         self.convertRoomPoly(self.ctx.cfg.mapImg, self.ent.poly),
+    //         {
+    //           color: 'transparent',
+    //           pane: 'roomLabel',
+    //           interactive: false,
+    //         }
+    //       )
+    //       self.label.name$ = 'ROOM:' + self.ent.name
+    //       let tooltip = L.tooltip({
+    //         permanent: true,
+    //         direction: 'center',
+    //         opacity: 1,
+    //         className: 'polygon-labels',
+    //       })
+    //       tooltip.setContent(
+    //         '<div class="' +
+    //           'xleaflet-zoom-animated ' +
+    //           'plantquest-room-label ' +
+    //           `">${self.ent.name}</div>`
+    //       )
+    //       self.label.bindTooltip(tooltip)
+    //     }
+    //     if (layer) {
+    //       self.label.addTo(layer)
+    //       shown = true
+    //     }
+    //   } else {
+    //     if (null != self.label) {
+    //       self.label.remove()
+    //     }
+    //   }
+    //   return shown
+    // }
     onClick(event) {
-      let self2 = this;
       console.log("onClick", event);
-      self2.select(self2.ent.id);
     }
     // Utility functions here for dev
     convert_poly_y(img, y) {
@@ -24983,7 +24992,46 @@ let Leaflet = require('../../verify/leaflet.js')
 let { PlantquestRoomDisplay } = require('../dist/room-display.umd.cjs')
 
 describe('RoomDisplay', () => {
-  const options = {}
+  const options = {
+    debug: false,
+    rooms: [
+      {
+        id: 'roomA',
+        title: 'Room A',
+        pane: 'room',
+        room_poly: [
+          [53.138881, 2086.226563],
+          [53.138881, 2116],
+          [47.135928, 2116],
+          [47.135928, 2086.226563],
+        ],
+      },
+      {
+        id: 'roomB',
+        title: 'Room B',
+        pane: 'room',
+        room_poly: [
+          [60.309538, 2234.9375],
+          [60.309538, 2255.273438],
+          [58.52124, 2255.273438],
+          [58.52124, 2252.109375],
+          [56.248232, 2252.109375],
+          [56.248232, 2234.9375],
+        ],
+      },
+      {
+        id: 'roomC',
+        title: 'Room C',
+        pane: 'room',
+        room_poly: [
+          [3.653769, 2155.78125],
+          [3.653769, 2173.007813],
+          [-2.670909, 2173.007813],
+          [-2.670909, 2155.78125],
+        ],
+      },
+    ],
+  }
 
   test('leaflet-happy', () => {
     expect(Leaflet).toBeDefined()
@@ -25002,17 +25050,61 @@ describe('RoomDisplay', () => {
     L.tileLayer(
       'https://plantquest-demo01-map01.s3.eu-west-1.amazonaws.com/tiles/pqd-pq01-m01-013/{z}/{x}/{y}.png'
     ).addTo(map2)
+
+    map2.createPane('room')
+    let roomPane1 = map2.getPane('room')
+    roomPane1.style.zIndex = 230
+
+    expect(map2._panes.room).toBeDefined()
   })
 
   test('room-display-happy', () => {
     expect(PlantquestRoomDisplay).toBeDefined()
   })
 
-  // test('room-display-create', () => {})
+  test('room-display-create', () => {
+    let plantquestRoomDisplay1 = new PlantquestRoomDisplay(options)
+    expect(plantquestRoomDisplay1._state).toBeDefined()
+  })
 
-  // test('room-display-add-rooms', () => {})
+  test('room-display-add-rooms', () => {
+    let map3 = L.map(document.createElement('div'), {
+      minZoom: 1.7,
+    }).setView([50.154377, 2154.375], 1.7)
 
-  // test('room-display-remove-rooms', () => {})
+    L.tileLayer(
+      'https://plantquest-demo01-map01.s3.eu-west-1.amazonaws.com/tiles/pqd-pq01-m01-013/{z}/{x}/{y}.png'
+    ).addTo(map3)
+
+    map3.createPane('room')
+    let roomPane2 = map3.getPane('room')
+    roomPane2.style.zIndex = 230
+
+    let plantquestRoomDisplay2 = new PlantquestRoomDisplay(options)
+    expect(plantquestRoomDisplay2._map).toBeUndefined()
+    plantquestRoomDisplay2.addTo(map3)
+    expect(plantquestRoomDisplay2._map).toBeDefined()
+  })
+
+  test('room-display-remove-rooms', () => {
+    let map4 = L.map(document.createElement('div'), {
+      minZoom: 1.7,
+    }).setView([50.154377, 2154.375], 1.7)
+
+    L.tileLayer(
+      'https://plantquest-demo01-map01.s3.eu-west-1.amazonaws.com/tiles/pqd-pq01-m01-013/{z}/{x}/{y}.png'
+    ).addTo(map4)
+
+    map4.createPane('room')
+    let roomPane3 = map4.getPane('room')
+    roomPane3.style.zIndex = 230
+
+    let plantquestRoomDisplay3 = new PlantquestRoomDisplay(options)
+    plantquestRoomDisplay3.addTo(map4)
+    expect(plantquestRoomDisplay3._map).toBeDefined()
+    plantquestRoomDisplay3.remove()
+    expect(plantquestRoomDisplay3._map).toEqual(null)
+  })
 })
 
 },{"../../verify/leaflet.js":6,"../dist/room-display.umd.cjs":2}],5:[function(require,module,exports){
