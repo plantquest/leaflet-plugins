@@ -35,12 +35,12 @@ const PlantquestRoomDisplay = L.Layer.extend({
     self.options.debug &&
       console.log('Local room variable before add:', self._state.roomByID)
 
-    self.options.rooms.forEach((geo: any) => {
-      let room = new Room(geo, {
+    self.options.rooms.forEach((roo: any) => {
+      let room = new Room(roo, {
         map: _map,
-        cfg: { room: { click: { active: true } } },
+        cfg: { room: { color: 'purple', click: { active: true } } },
       })
-      self._state.roomByID[geo.id] = room
+      self._state.roomByID[roo.id] = room
       self.showRoom(room, true)
     })
 
@@ -66,7 +66,7 @@ const PlantquestRoomDisplay = L.Layer.extend({
     }
     show = !!show
     if (true === show) {
-      room.show(null, null)
+      room.show()
     } else if (false === show) {
       room.hide()
     }
@@ -87,7 +87,7 @@ const PlantquestRoomDisplay = L.Layer.extend({
 class Room {
   ent: any = null
   ctx: any = null
-  poly: any = null
+  poly: ReturnType<typeof L.polygon>
   cfgroom: any = null
   label: any = null
 
@@ -95,196 +95,179 @@ class Room {
     this.ent = ent
     this.ctx = ctx
     this.cfgroom = ctx.cfg.room
+    this.poly = L.polygon(ent.room_poly, {
+      pane: ent.pane,
+      color: this.cfgroom.color,
+    })
   }
 
-  show(layer: any, room_poly: any) {
+  show() {
     let self = this
-    if (null == self.poly) {
-      self.poly = L.polygon(room_poly, {
-        pane: 'room',
-        color: self.cfgroom.color,
-      })
 
-      if (self.cfgroom.click.active) {
-        self.poly.on('click', self.onClick.bind(self))
-      }
+    if (self.cfgroom.click.active) {
+      self.poly.on('click', self.onClick.bind(self))
     }
 
-    self.poly.addTo(layer)
-
-    return self.poly
+    self.poly.addTo(self.ctx.map)
   }
 
-  hide() {}
-
-  focus(room: any) {
+  hide() {
     let self = this
-    if (null == room) return
-
-    let pqam = self.ctx.pqam
-
-    let roomlatlng = [0, 0]
-    for (let point of room.poly) {
-      if (point[0] > roomlatlng[0]) {
-        roomlatlng[0] = point[0]
-        roomlatlng[1] = point[1]
-      }
-    }
-
-    // let roompos = [roomlatlng[0],roomlatlng[1]-30]
-
-    let roompos_y = self.convert_poly_y(pqam.config.mapImg, roomlatlng[0])
-    let roompos_x = roomlatlng[1]
-    let roompos = self.c_asset_coords(roompos_y, roompos_x - 30)
-    // pqam.map.setView(roompos, pqam.config.mapRoomFocusZoom)
-    pqam.map.setView(roompos, pqam.config.mapRoomFocusZoom)
-
-    // pqam.zoomEndRender()
-
-    return roomlatlng
+    self.poly && self.poly.remove()
   }
 
-  select(roomId: any, opts?: any) {
-    let self = this
-    opts = opts || {}
+  // focus(room: any) {
+  //   let self = this
+  //   if (null == room) return
 
-    let pqam = self.ctx.pqam
+  //   let pqam = self.ctx.pqam
 
-    try {
-      let room = pqam.data.roomMap[roomId]
-      let isChosen =
-        pqam.loc.chosen.room && roomId === pqam.loc.chosen.room.room
+  //   let roomlatlng = [0, 0]
+  //   for (let point of room.poly) {
+  //     if (point[0] > roomlatlng[0]) {
+  //       roomlatlng[0] = point[0]
+  //       roomlatlng[1] = point[1]
+  //     }
+  //   }
 
-      if (null == pqam.data.roomMap[roomId] || isChosen) {
-        self.focus(pqam.loc.chosen.room)
-        return
-      }
+  //   let roompos_y = self.convert_poly_y(pqam.config.mapImg, roomlatlng[0])
+  //   let roompos_x = roomlatlng[1]
+  //   let roompos = self.c_asset_coords(roompos_y, roompos_x - 30)
+  //   pqam.map.setView(roompos, pqam.config.mapRoomFocusZoom)
 
-      pqam.log('selectRoom', roomId, room)
+  //   return roomlatlng
+  // }
 
-      // let roomState =
-      //   pqam.current.room[room.room] ||
-      //   (pqam.current.room[room.room] = { alarm: 'neutral' })
+  // select(roomId: any, opts?: any) {
+  //   let self = this
+  //   opts = opts || {}
 
-      if (pqam.loc.poly) {
-        pqam.loc.poly.remove(pqam.layer.room)
-        pqam.loc.poly = null
-      }
-      pqam.loc.room = null
+  //   let pqam = self.ctx.pqam
 
-      if (pqam.loc.chosen.poly && room !== pqam.loc.chosen.room) {
-        // let prevRoom = pqam.loc.chosen.room
-        // let prevRoomState =
-        //   pqam.current.room[prevRoom.room] ||
-        //   (pqam.current.room[prevRoom.room] = { alarm: 'neutral' })
+  //   try {
+  //     let room = pqam.data.roomMap[roomId]
+  //     let isChosen =
+  //       pqam.loc.chosen.room && roomId === pqam.loc.chosen.room.room
 
-        pqam.loc.chosen.poly.remove(pqam.layer.room)
-        pqam.loc.chosen.poly = null
-      }
+  //     if (null == pqam.data.roomMap[roomId] || isChosen) {
+  //       self.focus(pqam.loc.chosen.room)
+  //       return
+  //     }
 
-      if (pqam.loc.popup) {
-        pqam.loc.popup.remove(pqam.map)
-        pqam.loc.popop = null
-      }
+  //     pqam.log('selectRoom', roomId, room)
 
-      pqam.loc.chosen.room = room
+  //     if (pqam.loc.poly) {
+  //       pqam.loc.poly.remove(pqam.layer.room)
+  //       pqam.loc.poly = null
+  //     }
+  //     pqam.loc.room = null
 
-      let room_poly = self.convertRoomPoly(pqam.config.mapImg, room.poly)
+  //     if (pqam.loc.chosen.poly && room !== pqam.loc.chosen.room) {
+  //       pqam.loc.chosen.poly.remove(pqam.layer.room)
+  //       pqam.loc.chosen.poly = null
+  //     }
 
-      pqam.loc.chosen.poly = L.polygon(room_poly, {
-        pane: 'room',
-        color: pqam.config.room.color,
-      })
-      pqam.loc.chosen.poly.on('click', () => self.select(room.room))
+  //     if (pqam.loc.popup) {
+  //       pqam.loc.popup.remove(pqam.map)
+  //       pqam.loc.popop = null
+  //     }
 
-      pqam.loc.chosen.poly.addTo(pqam.layer.room)
+  //     pqam.loc.chosen.room = room
 
-      let roomlatlng: any = self.focus(room)
+  //     let room_poly = self.convertRoomPoly(pqam.config.mapImg, room.poly)
 
-      // convert for popup
-      let roompos_y = self.convert_poly_y(pqam.config.mapImg, roomlatlng[0])
-      let roompos_x = roomlatlng[1]
-      let roompos = self.c_asset_coords(roompos_y - 4, roompos_x + 5)
+  //     pqam.loc.chosen.poly = L.polygon(room_poly, {
+  //       pane: 'room',
+  //       color: pqam.config.room.color,
+  //     })
+  //     pqam.loc.chosen.poly.on('click', () => self.select(room.room))
 
-      // map focus on room selection
-      pqam.loc.popup = L.popup({
-        autoClose: false,
-        closeOnClick: false,
-      })
-        .setLatLng(roompos)
-        .setContent(pqam.roomPopup(pqam.loc.chosen.room))
-        .openOn(pqam.map)
+  //     pqam.loc.chosen.poly.addTo(pqam.layer.room)
 
-      if (!opts.mute) {
-        pqam.click({ select: 'room', room: pqam.loc.chosen.room.room })
-      }
-    } catch (e: any) {
-      pqam.log('ERROR', 'selectRoom', '1010', roomId, e.message, e)
-    }
-  }
+  //     let roomlatlng: any = self.focus(room)
 
-  onZoom(zoom: any, mapID: any, layer: any) {
-    let self = this
-    let mapMatch = 1 + parseInt(mapID) == parseInt(self.ent.map)
-    let showRoomLabel = 1 === parseInt(self.ent.showlabel)
+  //     // convert for popup
+  //     let roompos_y = self.convert_poly_y(pqam.config.mapImg, roomlatlng[0])
+  //     let roompos_x = roomlatlng[1]
+  //     let roompos = self.c_asset_coords(roompos_y - 4, roompos_x + 5)
 
-    let showNameZoom =
-      null == self.cfgroom.label.zoom
-        ? self.ctx.cfg.mapMaxZoom
-        : self.cfgroom.label.zoom
+  //     // map focus on room selection
+  //     pqam.loc.popup = L.popup({
+  //       autoClose: false,
+  //       closeOnClick: false,
+  //     })
+  //       .setLatLng(roompos)
+  //       .setContent(pqam.roomPopup(pqam.loc.chosen.room))
+  //       .openOn(pqam.map)
 
-    let showLabel = showNameZoom <= zoom && mapMatch && showRoomLabel
+  //     if (!opts.mute) {
+  //       pqam.click({ select: 'room', room: pqam.loc.chosen.room.room })
+  //     }
+  //   } catch (e: any) {
+  //     pqam.log('ERROR', 'selectRoom', '1010', roomId, e.message, e)
+  //   }
+  // }
 
-    let shown = false
+  // onZoom(zoom: any, mapID: any, layer: any) {
+  //   let self = this
+  //   let mapMatch = 1 + parseInt(mapID) == parseInt(self.ent.map)
+  //   let showRoomLabel = 1 === parseInt(self.ent.showlabel)
 
-    if (showLabel) {
-      if (null == self.label && self.ent.poly) {
-        self.label = L.polygon(
-          self.convertRoomPoly(self.ctx.cfg.mapImg, self.ent.poly),
-          {
-            color: 'transparent',
-            pane: 'roomLabel',
-            interactive: false,
-          }
-        )
+  //   let showNameZoom =
+  //     null == self.cfgroom.label.zoom
+  //       ? self.ctx.cfg.mapMaxZoom
+  //       : self.cfgroom.label.zoom
 
-        self.label.name$ = 'ROOM:' + self.ent.name
+  //   let showLabel = showNameZoom <= zoom && mapMatch && showRoomLabel
 
-        let tooltip = L.tooltip({
-          permanent: true,
-          direction: 'center',
-          opacity: 1,
-          className: 'polygon-labels',
-        })
+  //   let shown = false
 
-        tooltip.setContent(
-          '<div class="' +
-            'xleaflet-zoom-animated ' +
-            'plantquest-room-label ' +
-            `">${self.ent.name}</div>`
-        )
+  //   if (showLabel) {
+  //     if (null == self.label && self.ent.poly) {
+  //       self.label = L.polygon(
+  //         self.convertRoomPoly(self.ctx.cfg.mapImg, self.ent.poly),
+  //         {
+  //           color: 'transparent',
+  //           pane: 'roomLabel',
+  //           interactive: false,
+  //         }
+  //       )
 
-        self.label.bindTooltip(tooltip)
+  //       self.label.name$ = 'ROOM:' + self.ent.name
 
-        // let _c = poly.getBounds().getCenter()
-      }
+  //       let tooltip = L.tooltip({
+  //         permanent: true,
+  //         direction: 'center',
+  //         opacity: 1,
+  //         className: 'polygon-labels',
+  //       })
 
-      if (layer) {
-        self.label.addTo(layer)
-        shown = true
-      }
-    } else {
-      if (null != self.label) {
-        self.label.remove()
-      }
-    }
-    return shown
-  }
+  //       tooltip.setContent(
+  //         '<div class="' +
+  //           'xleaflet-zoom-animated ' +
+  //           'plantquest-room-label ' +
+  //           `">${self.ent.name}</div>`
+  //       )
+
+  //       self.label.bindTooltip(tooltip)
+  //     }
+
+  //     if (layer) {
+  //       self.label.addTo(layer)
+  //       shown = true
+  //     }
+  //   } else {
+  //     if (null != self.label) {
+  //       self.label.remove()
+  //     }
+  //   }
+  //   return shown
+  // }
 
   onClick(event: any) {
-    let self = this
+    // let self = this
     console.log('onClick', event)
-    self.select(self.ent.id)
+    // self.select(self.ent.id)
   }
 
   // Utility functions here for dev
