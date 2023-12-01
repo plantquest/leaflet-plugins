@@ -116,27 +116,28 @@ class Room {
     self.poly && self.poly.remove()
   }
 
-  // focus(room: any) {
-  //   let self = this
-  //   if (null == room) return
+  focus(room: any) {
+    // Called by select()
+    let self = this
+    if (null == room) return
 
-  //   let pqam = self.ctx.pqam
+    let roomlatlng = [0, 0]
+    for (let point of room.poly) {
+      if (point[0] > roomlatlng[0]) {
+        roomlatlng[0] = point[0]
+        roomlatlng[1] = point[1]
+      }
+    }
 
-  //   let roomlatlng = [0, 0]
-  //   for (let point of room.poly) {
-  //     if (point[0] > roomlatlng[0]) {
-  //       roomlatlng[0] = point[0]
-  //       roomlatlng[1] = point[1]
-  //     }
-  //   }
+    // mapImg: [7800, 5850]
+    let roompos_y = self.convert_poly_y([7800, 5850], roomlatlng[0])
+    let roompos_x = roomlatlng[1]
+    let roompos = self.c_asset_coords(roompos_y, roompos_x - 30)
+    // pqam.config.mapRoomFocusZoom: 5
+    self.ctx.map.setView(roompos, 5)
 
-  //   let roompos_y = self.convert_poly_y(pqam.config.mapImg, roomlatlng[0])
-  //   let roompos_x = roomlatlng[1]
-  //   let roompos = self.c_asset_coords(roompos_y, roompos_x - 30)
-  //   pqam.map.setView(roompos, pqam.config.mapRoomFocusZoom)
-
-  //   return roomlatlng
-  // }
+    return roomlatlng
+  }
 
   // select(roomId: any, opts?: any) {
   //   let self = this
