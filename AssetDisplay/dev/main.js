@@ -12,17 +12,25 @@ const map = L.map('map', {
   doubleClickZoom: false,
   attributionControl: false,
   editable: true,
-});
+}).setView([0, 0], 4); // Set default view and zoom level
 
 L.tileLayer('https://plantquest-demo01-map01.s3.eu-west-1.amazonaws.com/tiles/pqd-pq01-m01-013/{z}/{x}/{y}.png', {
-    maxZoom: 19,
+  maxZoom: 19,
+  minZoom: 2,
 }).addTo(map);
 
-const assetsOptions = [
-    // Mock assets data
-    { id: 'asset1', name: 'Asset 1', xco: 51.505, yco: -0.09, atype: 'Equipment' },
-    { id: 'asset2', name: 'Asset 2', xco: 51.506, yco: -0.091, atype: 'Room/Area' }
-];
+const assets = Array.from({ length: 20 }, () => ({
+  id: `room-${Math.random().toString(36).substr(2, 9)}`,
+  x: Math.random() * 300 - 150, // Make sure these coordinates are within your map's view
+  y: Math.random() * 300 - 150,
+  value: Math.floor(Math.random() * 5) + 1,
+}));
 
-const assetDisplay = new PlantquestAssetDisplay({ assetsOptions });
+console.log("Generated Assets:", assets); 
+
+const assetDisplay = new PlantquestAssetDisplay({ assets });
 assetDisplay.addTo(map);
+
+// Set map bounds if needed
+const bounds = [[-200, -200], [200, 200]];
+map.fitBounds(bounds);
