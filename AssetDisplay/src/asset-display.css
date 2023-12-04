@@ -1,8 +1,20 @@
-.asset-display-container {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
+/* Increased sizes for visibility */
+.marker-asset {
+  background-color: lightgreen;
+  border-radius: 50%;
+  color: black;
+  text-align: center;
+  line-height: 60px; /* Adjusted line height */
+  width: 60px; /* Added width */
+  height: 60px; /* Added height */
 }
 
-/*TODO: ADD STYLES HERE OF MARKERS HERE*/
+.marker-cluster {
+  background-color: yellow;
+  border-radius: 50%;
+  color: black;
+  text-align: center;
+  line-height: 80px; /* Adjusted line height */
+  width: 80px; /* Added width */
+  height: 80px; /* Added height */
+}
