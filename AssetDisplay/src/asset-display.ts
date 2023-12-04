@@ -1,20 +1,24 @@
-import L from 'leaflet'
-import './asset-display.css'
+import L from 'leaflet';
+import 'leaflet.markercluster';
+
+import './asset-display.css';
 
 interface Asset {
   id: string;
-  name: string;
-  xco: number;
-  yco: number;
-  atype: string;
+  x: number;
+  y: number;
+  value: number;
 }
 
 interface AssetDisplayOptions extends L.ControlOptions {
   assets: Asset[];
 }
 
+interface CustomMarker extends L.Marker {
+  assetValue?: number; // Extend the L.Marker to include the custom property
+}
+
 const PlantquestAssetDisplay = L.Control.extend({
-  //TODO: Check all possible options to pass in the constructor
   options: {} as AssetDisplayOptions,
 
   initialize: function (options: AssetDisplayOptions) {
@@ -22,14 +26,38 @@ const PlantquestAssetDisplay = L.Control.extend({
   },
 
   onAdd: function (map: L.Map) {
-    // Initial setup for mocked assets
-    const container = L.DomUtil.create('div', 'asset-display-container');
-    this.options.assets.forEach((asset: Asset) => {
-      L.marker([asset.xco, asset.yco])
-        .addTo(map)
-        .bindPopup(`${asset.name} (${asset.atype})`);
+    // Create a marker cluster group
+    const markers = L.markerClusterGroup({
+      iconCreateFunction: function(cluster) {
+        const childMarkers = cluster.getAllChildMarkers() as CustomMarker[];
+        let sum = 0;
+        childMarkers.forEach(marker => {
+          sum += marker.assetValue || 0;
+        });
+        return L.divIcon({
+          html: `<div class="cluster-marker">${sum}</div>`,
+          className: 'marker-cluster',
+          iconSize: L.point(40, 40)
+        });
+      }
     });
-    return container;
+
+    this.options.assets.forEach(asset => {
+      console.log("Creating marker for asset:", asset); // Debug: Log each asset
+    
+      const marker = L.marker([asset.y, asset.x], {
+        icon: L.divIcon({
+          html: `<div class="asset-marker">${asset.value}</div>`,
+          className: 'marker-asset',
+          iconSize: L.point(60, 60) // Increased icon size
+        })
+      }) as CustomMarker;
+      marker.assetValue = asset.value;
+      markers.addLayer(marker);
+    });
+    
+    map.addLayer(markers);
+    return L.DomUtil.create('div', 'asset-display-container');
   },
 
   onRemove: function (_map: L.Map) {
