@@ -298,13 +298,9 @@ class Room {
 
   demoSelect() {
     let self = this
-    // Triggered on room click
-    // Get center of room polygon
     let roomCenter = self.poly.getCenter()
-    // Soft zoom to fit room polygon
     self.ctx.map.flyTo(roomCenter, 4)
 
-    // Create and show tooltip
     let tooltip = L.tooltip({
       permanent: true,
       direction: 'center',
