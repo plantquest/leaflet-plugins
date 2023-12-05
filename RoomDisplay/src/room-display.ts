@@ -38,7 +38,14 @@ const PlantquestRoomDisplay = L.Layer.extend({
     self.options.rooms.forEach((roo: any) => {
       let room = new Room(roo, {
         map: _map,
-        cfg: { room: { color: 'purple', click: { active: true } } },
+        cfg: {
+          mapMaxZoom: 2,
+          room: {
+            label: { zoom: 2 },
+            color: 'purple',
+            click: { active: true },
+          },
+        },
       })
       self._state.roomByID[roo.id] = room
       self.showRoom(room, true)
@@ -136,6 +143,8 @@ class Room {
     // pqam.config.mapRoomFocusZoom: 5
     self.ctx.map.setView(roompos, 5)
 
+    self.zoomEndRender()
+
     return roomlatlng
   }
 
@@ -209,61 +218,71 @@ class Room {
   //   }
   // }
 
-  // onZoom(zoom: any, mapID: any, layer: any) {
-  //   let self = this
-  //   let mapMatch = 1 + parseInt(mapID) == parseInt(self.ent.map)
-  //   let showRoomLabel = 1 === parseInt(self.ent.showlabel)
+  onZoom(zoom: any, mapID: any) {
+    // Called by zoomEndRender() [temp], which is called by focus()
+    let self = this
+    let mapMatch = 1 + parseInt(mapID) == parseInt(self.ent.map)
+    let showRoomLabel = 1 === parseInt(self.ent.showlabel)
 
-  //   let showNameZoom =
-  //     null == self.cfgroom.label.zoom
-  //       ? self.ctx.cfg.mapMaxZoom
-  //       : self.cfgroom.label.zoom
+    let showNameZoom =
+      null == self.cfgroom.label.zoom
+        ? self.ctx.cfg.mapMaxZoom
+        : self.cfgroom.label.zoom
 
-  //   let showLabel = showNameZoom <= zoom && mapMatch && showRoomLabel
+    let showLabel = showNameZoom <= zoom && mapMatch && showRoomLabel
 
-  //   let shown = false
+    let shown = false
 
-  //   if (showLabel) {
-  //     if (null == self.label && self.ent.poly) {
-  //       self.label = L.polygon(
-  //         self.convertRoomPoly(self.ctx.cfg.mapImg, self.ent.poly),
-  //         {
-  //           color: 'transparent',
-  //           pane: 'roomLabel',
-  //           interactive: false,
-  //         }
-  //       )
+    if (showLabel) {
+      if (null == self.label && self.ent.poly) {
+        self.label = L.polygon(
+          self.convertRoomPoly(self.ctx.cfg.mapImg, self.ent.poly),
+          {
+            color: 'transparent',
+            pane: 'roomLabel',
+            interactive: false,
+          }
+        )
 
-  //       self.label.name$ = 'ROOM:' + self.ent.name
+        self.label.name$ = 'ROOM:' + self.ent.name
 
-  //       let tooltip = L.tooltip({
-  //         permanent: true,
-  //         direction: 'center',
-  //         opacity: 1,
-  //         className: 'polygon-labels',
-  //       })
+        let tooltip = L.tooltip({
+          permanent: true,
+          direction: 'center',
+          opacity: 1,
+          className: 'polygon-labels',
+        })
 
-  //       tooltip.setContent(
-  //         '<div class="' +
-  //           'xleaflet-zoom-animated ' +
-  //           'plantquest-room-label ' +
-  //           `">${self.ent.name}</div>`
-  //       )
+        tooltip.setContent(
+          '<div class="' +
+            'xleaflet-zoom-animated ' +
+            'plantquest-room-label ' +
+            `">${self.ent.name}</div>`
+        )
 
-  //       self.label.bindTooltip(tooltip)
-  //     }
+        self.label.bindTooltip(tooltip)
+      }
 
-  //     if (layer) {
-  //       self.label.addTo(layer)
-  //       shown = true
-  //     }
-  //   } else {
-  //     if (null != self.label) {
-  //       self.label.remove()
-  //     }
-  //   }
-  //   return shown
-  // }
+      if (self.ctx.map) {
+        self.label.addTo(self.ctx.map)
+        shown = true
+      }
+    } else {
+      if (null != self.label) {
+        self.label.remove()
+      }
+    }
+    return shown
+  }
+
+  zoomEndRender() {
+    // let zoom = self.map.getZoom()
+    // if (null == zoom) return
+    // // TODO: need to define a zoom event schema
+    // let shown = Object.values(self.room.map).map((room) =>
+    //   room.onZoom(zoom, self.loc.map, self.layer.roomLabel)
+    // )
+  }
 
   onClick(event: any) {
     // let self = this
