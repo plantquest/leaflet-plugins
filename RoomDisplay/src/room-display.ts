@@ -6,9 +6,9 @@ import './room-display.css'
 // TODO: implement Gubu with interfaces
 interface RoomDef {
   id: string
-  title: string
-  latlngs: Array<Array<string>>
-  colour: string
+  name: string
+  pane: string
+  poly: Array<Array<string>>
 }
 
 interface PlantquestRoomDisplayOptions extends L.ControlOptions {
@@ -89,6 +89,10 @@ const PlantquestRoomDisplay = L.Layer.extend({
       }
     }
   },
+
+  resetDemoSelect: function (_map: any) {
+    _map.setView([50.154377, 2154.375], 1.7)
+  },
 })
 
 class Room {
@@ -102,7 +106,7 @@ class Room {
     this.ent = ent
     this.ctx = ctx
     this.cfgroom = ctx.cfg.room
-    this.poly = L.polygon(ent.room_poly, {
+    this.poly = L.polygon(ent.poly, {
       pane: ent.pane,
       color: this.cfgroom.color,
     })
@@ -285,9 +289,37 @@ class Room {
   }
 
   onClick(event: any) {
-    // let self = this
+    // BUG TODO: Zoom and tooltip defaults to C regardless of click unless rooms are added and removed first
+    let self = this
     console.log('onClick', event)
+    self.demoSelect()
     // self.select(self.ent.id)
+  }
+
+  demoSelect() {
+    let self = this
+    // Triggered on room click
+    // Get center of room polygon
+    let roomCenter = self.poly.getCenter()
+    // Soft zoom to fit room polygon
+    self.ctx.map.flyTo(roomCenter, 4)
+
+    // Create and show tooltip
+    let tooltip = L.tooltip({
+      permanent: true,
+      direction: 'center',
+      opacity: 1,
+      className: 'polygon-labels',
+    })
+
+    self.poly.bindTooltip(tooltip)
+
+    tooltip.setContent(
+      '<div class="' +
+        'xleaflet-zoom-animated ' +
+        'plantquest-room-label ' +
+        `">${self.ent.name}</div>`
+    )
   }
 
   // Utility functions here for dev
