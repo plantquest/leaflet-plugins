@@ -11,6 +11,7 @@ interface RoomDef {
   config: Object
 }
 
+// TODO bug: Gubu not catching mismatch in options argument
 interface PlantquestRoomDisplayOptions extends L.ControlOptions {
   debug: boolean
   rooms: RoomDef[]
