@@ -8,6 +8,8 @@ interface Asset {
   x: number;
   y: number;
   value: number;
+  color: string;
+  borderColor: string;
 }
 
 interface AssetDisplayOptions extends L.ControlOptions {
@@ -15,27 +17,33 @@ interface AssetDisplayOptions extends L.ControlOptions {
 }
 
 interface CustomMarker extends L.Marker {
-  assetValue?: number; // Extend the L.Marker to include the custom property
+  assetValue?: number;
 }
 
 const PlantquestAssetDisplay = L.Control.extend({
   options: {} as AssetDisplayOptions,
+  _map: null as L.Map | null,
+  clusterLayer: null as L.MarkerClusterGroup | null,
 
   initialize: function (options: AssetDisplayOptions) {
     L.Util.setOptions(this, options);
+    this.clusterLayer = L.markerClusterGroup(); 
   },
 
   onAdd: function (map: L.Map) {
-    // Create a marker cluster group
+    this._map = map;
     const markers = L.markerClusterGroup({
+      maxClusterRadius: 10,
       iconCreateFunction: function(cluster) {
         const childMarkers = cluster.getAllChildMarkers() as CustomMarker[];
         let sum = 0;
         childMarkers.forEach(marker => {
           sum += marker.assetValue || 0;
         });
+
+        const clusterColor = sum > 10 ? 'yellow' : 'lightgreen';
         return L.divIcon({
-          html: `<div class="cluster-marker">${sum}</div>`,
+          html: `<div class="cluster-marker" style="background-color: ${clusterColor};">${sum}</div>`,
           className: 'marker-cluster',
           iconSize: L.point(40, 40)
         });
@@ -43,25 +51,37 @@ const PlantquestAssetDisplay = L.Control.extend({
     });
 
     this.options.assets.forEach(asset => {
-      console.log("Creating marker for asset:", asset); // Debug: Log each asset
-    
       const marker = L.marker([asset.y, asset.x], {
         icon: L.divIcon({
-          html: `<div class="asset-marker">${asset.value}</div>`,
+          html: `<div class="asset-marker" style="background-color: ${asset.color}; border-color: ${asset.borderColor};">${asset.value}</div>`,
           className: 'marker-asset',
-          iconSize: L.point(60, 60) // Increased icon size
+          iconSize: L.point(30, 30)
         })
       }) as CustomMarker;
       marker.assetValue = asset.value;
       markers.addLayer(marker);
     });
-    
+
     map.addLayer(markers);
     return L.DomUtil.create('div', 'asset-display-container');
   },
 
   onRemove: function (_map: L.Map) {
     // Clean up if needed
+  },
+  getClusterLayer: function() {
+    return this.clusterLayer;
+  },
+  hideClusters: function() {
+    if (this._map && this.clusterLayer) {
+      this._map.removeLayer(this.clusterLayer);
+    }
+  },
+
+  showClusters: function() {
+    if (this._map && this.clusterLayer) {
+      this._map.addLayer(this.clusterLayer);
+    }
   },
 });
 
