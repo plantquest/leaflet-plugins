@@ -3,44 +3,70 @@ let { PlantquestRoomDisplay } = require('../dist/room-display.umd.cjs')
 
 describe('RoomDisplay', () => {
   const options = {
-    debug: false,
+    debug: true,
     rooms: [
       {
         id: 'roomA',
-        title: 'Room A',
-        pane: 'room',
-        room_poly: [
-          [53.138881, 2086.226563],
-          [53.138881, 2116],
-          [47.135928, 2116],
-          [47.135928, 2086.226563],
+        name: 'Room A',
+        poly: [
+          [52.7, 2086],
+          [52.7, 2115.7],
+          [47.4, 2115.7],
+          [47.4, 2086],
         ],
       },
       {
         id: 'roomB',
-        title: 'Room B',
-        pane: 'room',
-        room_poly: [
-          [60.309538, 2234.9375],
-          [60.309538, 2255.273438],
-          [58.52124, 2255.273438],
-          [58.52124, 2252.109375],
-          [56.248232, 2252.109375],
-          [56.248232, 2234.9375],
+        name: 'Room B',
+        poly: [
+          [60.6, 2235],
+          [60.6, 2255.3],
+          [58.3, 2255.3],
+          [58.3, 2252],
+          [56.1, 2252],
+          [56.1, 2235],
         ],
       },
       {
         id: 'roomC',
-        title: 'Room C',
-        pane: 'room',
-        room_poly: [
-          [3.653769, 2155.78125],
-          [3.653769, 2173.007813],
-          [-2.670909, 2173.007813],
-          [-2.670909, 2155.78125],
+        name: 'Room C',
+        poly: [
+          [3.4, 2155.6],
+          [3.4, 2172.5],
+          [-3.4, 2172.5],
+          [-3.4, 2155.6],
         ],
       },
     ],
+    pqam: {
+      loc: {
+        poly: null,
+        room: null,
+        chosen: {
+          poly: null,
+          room: null,
+        },
+      },
+      config: {
+        mapImg: [7800, 5850],
+        mapMaxZoom: 2,
+        mapRoomFocusZoom: 5,
+        room: {
+          click: {
+            active: true,
+          },
+          label: {
+            zoom: null,
+          },
+          color: '#33f',
+        },
+      },
+      data: { roomMap: { roomA: null, roomB: null, roomC: null } },
+      layer: { room: null },
+      map: null,
+      roomPopup: null,
+      click: null,
+    },
   }
 
   test('leaflet-happy', () => {

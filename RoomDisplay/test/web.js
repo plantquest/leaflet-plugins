@@ -24772,12 +24772,14 @@ var __publicField = (obj, key, value) => {
       self2.options.rooms.forEach((roo) => {
         let room = new Room(roo, {
           map: _map,
-          cfg: { room: { color: "purple", click: { active: true } } }
+          cfg: self2.options.pqam.config,
+          pqam: self2.options.pqam
         });
         self2._state.roomByID[roo.id] = room;
         self2.showRoom(room, true);
       });
       self2.options.debug && console.log("Local room variable after add:", self2._state.roomByID);
+      console.log("map:", _map);
     },
     onRemove: function(_map) {
       let self2 = this;
@@ -24806,6 +24808,9 @@ var __publicField = (obj, key, value) => {
           room.hide();
         }
       }
+    },
+    resetDemoSelect: function(_map) {
+      _map.setView([50.154377, 2154.375], 1.7);
     }
   });
   class Room {
@@ -24818,8 +24823,8 @@ var __publicField = (obj, key, value) => {
       this.ent = ent;
       this.ctx = ctx;
       this.cfgroom = ctx.cfg.room;
-      this.poly = L$1.polygon(ent.room_poly, {
-        pane: ent.pane,
+      this.poly = L$1.polygon(ent.poly, {
+        pane: "room",
         color: this.cfgroom.color
       });
     }
@@ -24849,64 +24854,60 @@ var __publicField = (obj, key, value) => {
       let roompos_y = self2.convert_poly_y(pqam.config.mapImg, roomlatlng[0]);
       let roompos_x = roomlatlng[1];
       let roompos = self2.c_asset_coords(roompos_y, roompos_x - 30);
-      pqam.map.setView(roompos, pqam.config.mapRoomFocusZoom);
+      self2.ctx.map.setView(roompos, pqam.config.mapRoomFocusZoom);
       return roomlatlng;
     }
-    // select(roomId: any, opts?: any) {
-    //   let self = this
-    //   opts = opts || {}
-    //   let pqam = self.ctx.pqam
-    //   try {
-    //     let room = pqam.data.roomMap[roomId]
-    //     let isChosen =
-    //       pqam.loc.chosen.room && roomId === pqam.loc.chosen.room.room
-    //     if (null == pqam.data.roomMap[roomId] || isChosen) {
-    //       self.focus(pqam.loc.chosen.room)
-    //       return
-    //     }
-    //     pqam.log('selectRoom', roomId, room)
-    //     if (pqam.loc.poly) {
-    //       pqam.loc.poly.remove(pqam.layer.room)
-    //       pqam.loc.poly = null
-    //     }
-    //     pqam.loc.room = null
-    //     if (pqam.loc.chosen.poly && room !== pqam.loc.chosen.room) {
-    //       pqam.loc.chosen.poly.remove(pqam.layer.room)
-    //       pqam.loc.chosen.poly = null
-    //     }
-    //     if (pqam.loc.popup) {
-    //       pqam.loc.popup.remove(pqam.map)
-    //       pqam.loc.popop = null
-    //     }
-    //     pqam.loc.chosen.room = room
-    //     let room_poly = self.convertRoomPoly(pqam.config.mapImg, room.poly)
-    //     pqam.loc.chosen.poly = L.polygon(room_poly, {
-    //       pane: 'room',
-    //       color: pqam.config.room.color,
-    //     })
-    //     pqam.loc.chosen.poly.on('click', () => self.select(room.room))
-    //     pqam.loc.chosen.poly.addTo(pqam.layer.room)
-    //     let roomlatlng: any = self.focus(room)
-    //     // convert for popup
-    //     let roompos_y = self.convert_poly_y(pqam.config.mapImg, roomlatlng[0])
-    //     let roompos_x = roomlatlng[1]
-    //     let roompos = self.c_asset_coords(roompos_y - 4, roompos_x + 5)
-    //     // map focus on room selection
-    //     pqam.loc.popup = L.popup({
-    //       autoClose: false,
-    //       closeOnClick: false,
-    //     })
-    //       .setLatLng(roompos)
-    //       .setContent(pqam.roomPopup(pqam.loc.chosen.room))
-    //       .openOn(pqam.map)
-    //     if (!opts.mute) {
-    //       pqam.click({ select: 'room', room: pqam.loc.chosen.room.room })
-    //     }
-    //   } catch (e: any) {
-    //     pqam.log('ERROR', 'selectRoom', '1010', roomId, e.message, e)
-    //   }
-    // }
-    // onZoom(zoom: any, mapID: any, layer: any) {
+    select(roomId, opts) {
+      let self2 = this;
+      opts = opts || {};
+      let pqam = self2.ctx.pqam;
+      try {
+        let room = pqam.data.roomMap[roomId];
+        let isChosen = pqam.loc.chosen.room && roomId === pqam.loc.chosen.room.room;
+        if (null == pqam.data.roomMap[roomId] || isChosen) {
+          self2.focus(pqam.loc.chosen.room);
+          return;
+        }
+        pqam.log("selectRoom", roomId, room);
+        if (pqam.loc.poly) {
+          pqam.loc.poly.remove(pqam.layer.room);
+          pqam.loc.poly = null;
+        }
+        pqam.loc.room = null;
+        if (pqam.loc.chosen.poly && room !== pqam.loc.chosen.room) {
+          pqam.loc.chosen.poly.remove(pqam.layer.room);
+          pqam.loc.chosen.poly = null;
+        }
+        if (pqam.loc.popup) {
+          pqam.loc.popup.remove(pqam.map);
+          pqam.loc.popop = null;
+        }
+        pqam.loc.chosen.room = room;
+        let room_poly = self2.convertRoomPoly(pqam.config.mapImg, room.poly);
+        pqam.loc.chosen.poly = L$1.polygon(room_poly, {
+          pane: "room",
+          color: pqam.config.room.color
+        });
+        pqam.loc.chosen.poly.on("click", () => self2.select(room.room));
+        pqam.loc.chosen.poly.addTo(pqam.layer.room);
+        let roomlatlng = self2.focus(room);
+        let roompos_y = self2.convert_poly_y(pqam.config.mapImg, roomlatlng[0]);
+        let roompos_x = roomlatlng[1];
+        let roompos = self2.c_asset_coords(roompos_y - 4, roompos_x + 5);
+        pqam.loc.popup = L$1.popup({
+          autoClose: false,
+          closeOnClick: false
+        }).setLatLng(roompos).setContent(pqam.roomPopup(pqam.loc.chosen.room)).openOn(pqam.map);
+        if (!opts.mute) {
+          pqam.click({ select: "room", room: pqam.loc.chosen.room.room });
+        }
+      } catch (e) {
+        pqam.log("ERROR", "selectRoom", "1010", roomId, e.message, e);
+      }
+    }
+    // Originally took layer as param
+    // onZoom(zoom: any, mapID: any) {
+    //   // Called by zoomEndRender() [temp], which is called by focus()
     //   let self = this
     //   let mapMatch = 1 + parseInt(mapID) == parseInt(self.ent.map)
     //   let showRoomLabel = 1 === parseInt(self.ent.showlabel)
@@ -24941,8 +24942,8 @@ var __publicField = (obj, key, value) => {
     //       )
     //       self.label.bindTooltip(tooltip)
     //     }
-    //     if (layer) {
-    //       self.label.addTo(layer)
+    //     if (self.ctx.map) {
+    //       self.label.addTo(self.ctx.map)
     //       shown = true
     //     }
     //   } else {
@@ -24953,7 +24954,24 @@ var __publicField = (obj, key, value) => {
     //   return shown
     // }
     onClick(event) {
+      let self2 = this;
       console.log("onClick", event);
+      self2.select(self2.ent.id);
+    }
+    demoSelect() {
+      let self2 = this;
+      let roomCenter = self2.poly.getCenter();
+      self2.ctx.map.flyTo(roomCenter, 4);
+      let tooltip = L$1.tooltip({
+        permanent: true,
+        direction: "center",
+        opacity: 1,
+        className: "polygon-labels"
+      });
+      self2.poly.bindTooltip(tooltip);
+      tooltip.setContent(
+        `<div class="xleaflet-zoom-animated plantquest-room-label ">${self2.ent.name}</div>`
+      );
     }
     // Utility functions here for dev
     convert_poly_y(img, y) {
@@ -24993,44 +25011,70 @@ let { PlantquestRoomDisplay } = require('../dist/room-display.umd.cjs')
 
 describe('RoomDisplay', () => {
   const options = {
-    debug: false,
+    debug: true,
     rooms: [
       {
         id: 'roomA',
-        title: 'Room A',
-        pane: 'room',
-        room_poly: [
-          [53.138881, 2086.226563],
-          [53.138881, 2116],
-          [47.135928, 2116],
-          [47.135928, 2086.226563],
+        name: 'Room A',
+        poly: [
+          [52.7, 2086],
+          [52.7, 2115.7],
+          [47.4, 2115.7],
+          [47.4, 2086],
         ],
       },
       {
         id: 'roomB',
-        title: 'Room B',
-        pane: 'room',
-        room_poly: [
-          [60.309538, 2234.9375],
-          [60.309538, 2255.273438],
-          [58.52124, 2255.273438],
-          [58.52124, 2252.109375],
-          [56.248232, 2252.109375],
-          [56.248232, 2234.9375],
+        name: 'Room B',
+        poly: [
+          [60.6, 2235],
+          [60.6, 2255.3],
+          [58.3, 2255.3],
+          [58.3, 2252],
+          [56.1, 2252],
+          [56.1, 2235],
         ],
       },
       {
         id: 'roomC',
-        title: 'Room C',
-        pane: 'room',
-        room_poly: [
-          [3.653769, 2155.78125],
-          [3.653769, 2173.007813],
-          [-2.670909, 2173.007813],
-          [-2.670909, 2155.78125],
+        name: 'Room C',
+        poly: [
+          [3.4, 2155.6],
+          [3.4, 2172.5],
+          [-3.4, 2172.5],
+          [-3.4, 2155.6],
         ],
       },
     ],
+    pqam: {
+      loc: {
+        poly: null,
+        room: null,
+        chosen: {
+          poly: null,
+          room: null,
+        },
+      },
+      config: {
+        mapImg: [7800, 5850],
+        mapMaxZoom: 2,
+        mapRoomFocusZoom: 5,
+        room: {
+          click: {
+            active: true,
+          },
+          label: {
+            zoom: null,
+          },
+          color: '#33f',
+        },
+      },
+      data: { roomMap: { roomA: null, roomB: null, roomC: null } },
+      layer: { room: null },
+      map: null,
+      roomPopup: null,
+      click: null,
+    },
   }
 
   test('leaflet-happy', () => {
