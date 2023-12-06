@@ -1,20 +1,41 @@
-/* Increased sizes for visibility */
-.marker-asset {
-  background-color: lightgreen;
+/* Styles for both individual asset markers and cluster markers */
+.asset-marker {
+  background-color: #6ecc3999; /* Default color for individual markers */
   border-radius: 50%;
   color: black;
   text-align: center;
-  line-height: 60px; /* Adjusted line height */
-  width: 60px; /* Added width */
-  height: 60px; /* Added height */
+  line-height: 30px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid #b5e28c99; /* Border color for markers */
 }
 
-.marker-cluster {
-  background-color: yellow;
+/* Adjustments for cluster markers (larger size and potential color change) */
+.cluster-marker {
+  background-color: yellow; /* Color for clusters with sum > 10 */
   border-radius: 50%;
   color: black;
   text-align: center;
-  line-height: 80px; /* Adjusted line height */
-  width: 80px; /* Added width */
-  height: 80px; /* Added height */
+  line-height: 40px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid orange; /* Border color for clusters */
+}
+
+.asset-display-container {
+  display: none; /* Initially hidden */
+}
+
+.leaflet-container {
+  background-color: #c9d486; /* Background color of the Leaflet container */
+}
+
+.hide-clusters .marker-cluster, .hide-clusters .asset-marker {
+  display: none;
 }
