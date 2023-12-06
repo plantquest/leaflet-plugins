@@ -36,7 +36,6 @@ const plantquestGeofenceDisplay = new PlantquestGeofenceDisplay({
         [47.4, 2115.7],
         [47.4, 2086],
       ],
-      colour: 'blue',
     },
     {
       id: 'buildingB',
@@ -49,7 +48,6 @@ const plantquestGeofenceDisplay = new PlantquestGeofenceDisplay({
         [56.1, 2252],
         [56.1, 2235],
       ],
-      colour: 'blue',
     },
     {
       id: 'buildingC',
@@ -60,7 +58,6 @@ const plantquestGeofenceDisplay = new PlantquestGeofenceDisplay({
         [-3.4, 2172.5],
         [-3.4, 2155.6],
       ],
-      colour: 'blue',
     },
   ],
   pqam: { config: { geofence: { click: { active: true }, color: '#f3f' } } },

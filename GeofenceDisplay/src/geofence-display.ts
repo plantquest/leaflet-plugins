@@ -7,7 +7,6 @@ interface GeofenceDef {
   id: string
   title: string
   latlngs: Array<Array<string>>
-  colour: string
 }
 
 interface PlantquestGeofenceDisplayOptions extends L.ControlOptions {
