@@ -20,6 +20,15 @@ map.createPane('room')
 let roomPane = map.getPane('room')
 roomPane.style.zIndex = 230
 
+let cfg = {
+  mapMaxZoom: 2,
+  room: {
+    label: { zoom: 2 },
+    color: 'purple',
+    click: { active: true },
+  },
+}
+
 let options = {
   debug: true,
   rooms: [
@@ -33,6 +42,7 @@ let options = {
         [47.4, 2115.7],
         [47.4, 2086],
       ],
+      config: cfg,
     },
     {
       id: 'roomB',
@@ -46,6 +56,7 @@ let options = {
         [56.1, 2252],
         [56.1, 2235],
       ],
+      config: cfg,
     },
     {
       id: 'roomC',
@@ -57,6 +68,7 @@ let options = {
         [-3.4, 2172.5],
         [-3.4, 2155.6],
       ],
+      config: cfg,
     },
   ],
 }
