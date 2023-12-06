@@ -217,70 +217,70 @@ class Room {
   }
 
   // Originally took layer as param
-  onZoom(zoom: any, mapID: any) {
-    // Called by zoomEndRender() [temp], which is called by focus()
-    let self = this
-    let mapMatch = 1 + parseInt(mapID) == parseInt(self.ent.map)
-    let showRoomLabel = 1 === parseInt(self.ent.showlabel)
+  // onZoom(zoom: any, mapID: any) {
+  //   // Called by zoomEndRender() [temp], which is called by focus()
+  //   let self = this
+  //   let mapMatch = 1 + parseInt(mapID) == parseInt(self.ent.map)
+  //   let showRoomLabel = 1 === parseInt(self.ent.showlabel)
 
-    let showNameZoom =
-      null == self.cfgroom.label.zoom
-        ? self.ctx.cfg.mapMaxZoom
-        : self.cfgroom.label.zoom
+  //   let showNameZoom =
+  //     null == self.cfgroom.label.zoom
+  //       ? self.ctx.cfg.mapMaxZoom
+  //       : self.cfgroom.label.zoom
 
-    let showLabel = showNameZoom <= zoom && mapMatch && showRoomLabel
+  //   let showLabel = showNameZoom <= zoom && mapMatch && showRoomLabel
 
-    let shown = false
+  //   let shown = false
 
-    if (showLabel) {
-      if (null == self.label && self.ent.poly) {
-        self.label = L.polygon(
-          self.convertRoomPoly(self.ctx.cfg.mapImg, self.ent.poly),
-          {
-            color: 'transparent',
-            pane: 'roomLabel',
-            interactive: false,
-          }
-        )
+  //   if (showLabel) {
+  //     if (null == self.label && self.ent.poly) {
+  //       self.label = L.polygon(
+  //         self.convertRoomPoly(self.ctx.cfg.mapImg, self.ent.poly),
+  //         {
+  //           color: 'transparent',
+  //           pane: 'roomLabel',
+  //           interactive: false,
+  //         }
+  //       )
 
-        self.label.name$ = 'ROOM:' + self.ent.name
+  //       self.label.name$ = 'ROOM:' + self.ent.name
 
-        let tooltip = L.tooltip({
-          permanent: true,
-          direction: 'center',
-          opacity: 1,
-          className: 'polygon-labels',
-        })
+  //       let tooltip = L.tooltip({
+  //         permanent: true,
+  //         direction: 'center',
+  //         opacity: 1,
+  //         className: 'polygon-labels',
+  //       })
 
-        tooltip.setContent(
-          '<div class="' +
-            'xleaflet-zoom-animated ' +
-            'plantquest-room-label ' +
-            `">${self.ent.name}</div>`
-        )
+  //       tooltip.setContent(
+  //         '<div class="' +
+  //           'xleaflet-zoom-animated ' +
+  //           'plantquest-room-label ' +
+  //           `">${self.ent.name}</div>`
+  //       )
 
-        self.label.bindTooltip(tooltip)
-      }
+  //       self.label.bindTooltip(tooltip)
+  //     }
 
-      if (self.ctx.map) {
-        self.label.addTo(self.ctx.map)
-        shown = true
-      }
-    } else {
-      if (null != self.label) {
-        self.label.remove()
-      }
-    }
-    return shown
-  }
+  //     if (self.ctx.map) {
+  //       self.label.addTo(self.ctx.map)
+  //       shown = true
+  //     }
+  //   } else {
+  //     if (null != self.label) {
+  //       self.label.remove()
+  //     }
+  //   }
+  //   return shown
+  // }
 
   onClick(event: any) {
     // BUG TODO: Zoom and tooltip defaults to C regardless of click unless rooms are added and removed first
     let self = this
     console.log('onClick', event)
-    self.demoSelect()
+    // self.demoSelect()
     // self.ent.id = 'roomA' etc
-    // self.select(self.ent.id)
+    self.select(self.ent.id)
   }
 
   demoSelect() {
