@@ -7,7 +7,6 @@ import './room-display.css'
 interface RoomDef {
   id: string
   name: string
-  pane: string
   poly: Array<Array<string>>
   config: Object
 }
@@ -39,7 +38,8 @@ const PlantquestRoomDisplay = L.Layer.extend({
     self.options.rooms.forEach((roo: any) => {
       let room = new Room(roo, {
         map: _map,
-        cfg: roo.config,
+        cfg: self.options.pqam.config,
+        pqam: self.options.pqam,
       })
       self._state.roomByID[roo.id] = room
       self.showRoom(room, true)
@@ -103,7 +103,7 @@ class Room {
     this.ctx = ctx
     this.cfgroom = ctx.cfg.room
     this.poly = L.polygon(ent.poly, {
-      pane: ent.pane,
+      pane: 'room',
       color: this.cfgroom.color,
     })
   }
@@ -128,6 +128,8 @@ class Room {
     let self = this
     if (null == room) return
 
+    let pqam = self.ctx.pqam
+
     let roomlatlng = [0, 0]
     for (let point of room.poly) {
       if (point[0] > roomlatlng[0]) {
@@ -136,12 +138,10 @@ class Room {
       }
     }
 
-    // mapImg: [7800, 5850]
-    let roompos_y = self.convert_poly_y([7800, 5850], roomlatlng[0])
+    let roompos_y = self.convert_poly_y(pqam.config.mapImg, roomlatlng[0])
     let roompos_x = roomlatlng[1]
     let roompos = self.c_asset_coords(roompos_y, roompos_x - 30)
-    // pqam.config.mapRoomFocusZoom: 5
-    self.ctx.map.setView(roompos, 5)
+    self.ctx.map.setView(roompos, pqam.config.mapRoomFocusZoom)
 
     return roomlatlng
   }

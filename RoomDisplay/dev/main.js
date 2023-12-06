@@ -6,6 +6,8 @@ import L from 'leaflet'
 import '@plantquest/room-display/dist/room-display.css'
 import { PlantquestRoomDisplay } from '@plantquest/room-display'
 
+// TODO bug: 'Error: Invalid tab ID: 1' from file undefined
+
 console.log('START', PlantquestRoomDisplay)
 
 const map = L.map('map', {
@@ -20,34 +22,22 @@ map.createPane('room')
 let roomPane = map.getPane('room')
 roomPane.style.zIndex = 230
 
-let cfg = {
-  mapMaxZoom: 2,
-  room: {
-    label: { zoom: 2 },
-    color: 'purple',
-    click: { active: true },
-  },
-}
-
 let options = {
   debug: true,
   rooms: [
     {
       id: 'roomA',
       name: 'Room A',
-      pane: 'room',
       poly: [
         [52.7, 2086],
         [52.7, 2115.7],
         [47.4, 2115.7],
         [47.4, 2086],
       ],
-      config: cfg,
     },
     {
       id: 'roomB',
       name: 'Room B',
-      pane: 'room',
       poly: [
         [60.6, 2235],
         [60.6, 2255.3],
@@ -56,21 +46,47 @@ let options = {
         [56.1, 2252],
         [56.1, 2235],
       ],
-      config: cfg,
     },
     {
       id: 'roomC',
       name: 'Room C',
-      pane: 'room',
       poly: [
         [3.4, 2155.6],
         [3.4, 2172.5],
         [-3.4, 2172.5],
         [-3.4, 2155.6],
       ],
-      config: cfg,
     },
   ],
+  pqam: {
+    loc: {
+      poly: null,
+      room: null,
+      chosen: {
+        poly: null,
+        room: null,
+      },
+    },
+    config: {
+      mapImg: [7800, 5850],
+      mapMaxZoom: 2,
+      mapRoomFocusZoom: 5,
+      room: {
+        click: {
+          active: true,
+        },
+        label: {
+          zoom: null,
+        },
+        color: '#33f',
+      },
+    },
+    data: { roomMap: { roomA: null, roomB: null, roomC: null } },
+    layer: { room: null },
+    map: null,
+    roomPopup: null,
+    click: null,
+  },
 }
 
 const plantquestRoomDisplay = new PlantquestRoomDisplay(options)
