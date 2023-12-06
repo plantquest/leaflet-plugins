@@ -43,7 +43,7 @@ const PlantquestGeofenceDisplay = L.Layer.extend({
     self.options.geofences.forEach((geo: any) => {
       let geofence = new Geofence(geo, {
         map: _map,
-        cfg: { geofence: { click: { active: true } } },
+        cfg: self.options.pqam.config,
       })
       self._state.geofenceByID[geo.id] = geofence
       self.showGeofence(geofence, true)
@@ -107,7 +107,10 @@ class Geofence {
   constructor(ent: any, ctx: any) {
     this.ent = ent
     this.ctx = ctx
-    this.poly = L.polygon(ent.latlngs, { pane: ent.pane, color: ent.colour })
+    this.poly = L.polygon(ent.latlngs, {
+      pane: 'geofence',
+      color: this.ctx.cfg.geofence.colour,
+    })
   }
 
   show() {

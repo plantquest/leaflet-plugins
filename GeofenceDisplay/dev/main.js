@@ -30,7 +30,6 @@ const plantquestGeofenceDisplay = new PlantquestGeofenceDisplay({
     {
       id: 'buildingA',
       title: 'Building A',
-      pane: 'geofence',
       latlngs: [
         [53.138881, 2086.226563],
         [53.138881, 2116],
@@ -42,7 +41,6 @@ const plantquestGeofenceDisplay = new PlantquestGeofenceDisplay({
     {
       id: 'buildingB',
       title: 'Building B',
-      pane: 'geofence',
       latlngs: [
         [60.309538, 2234.9375],
         [60.309538, 2255.273438],
@@ -56,7 +54,6 @@ const plantquestGeofenceDisplay = new PlantquestGeofenceDisplay({
     {
       id: 'buildingC',
       title: 'Building C',
-      pane: 'geofence',
       latlngs: [
         [3.653769, 2155.78125],
         [3.653769, 2173.007813],
@@ -66,6 +63,7 @@ const plantquestGeofenceDisplay = new PlantquestGeofenceDisplay({
       colour: 'blue',
     },
   ],
+  pqam: { config: { geofence: { click: { active: true }, color: '#f3f' } } },
 })
 
 document.getElementById('addGeofences').addEventListener('click', () => {
