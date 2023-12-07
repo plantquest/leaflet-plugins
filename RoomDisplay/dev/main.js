@@ -70,7 +70,7 @@ let options = {
     config: {
       mapImg: [7800, 5850],
       mapMaxZoom: 2,
-      mapRoomFocusZoom: 5,
+      mapRoomFocusZoom: 4,
       room: {
         click: {
           active: true,
