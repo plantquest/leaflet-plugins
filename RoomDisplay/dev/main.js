@@ -81,7 +81,42 @@ let options = {
         color: '#33f',
       },
     },
-    data: { roomMap: { roomA: null, roomB: null, roomC: null } },
+    data: {
+      roomMap: {
+        roomA: {
+          // id: 'roomA',
+          name: 'Room A',
+          poly: [
+            [52.7, 2086],
+            [52.7, 2115.7],
+            [47.4, 2115.7],
+            [47.4, 2086],
+          ],
+        },
+        roomB: {
+          // id: 'roomB',
+          name: 'Room B',
+          poly: [
+            [60.6, 2235],
+            [60.6, 2255.3],
+            [58.3, 2255.3],
+            [58.3, 2252],
+            [56.1, 2252],
+            [56.1, 2235],
+          ],
+        },
+        roomC: {
+          // id: 'roomC',
+          name: 'Room C',
+          poly: [
+            [3.4, 2155.6],
+            [3.4, 2172.5],
+            [-3.4, 2172.5],
+            [-3.4, 2155.6],
+          ],
+        },
+      },
+    },
     layer: { room: null },
     map: null,
     roomPopup: null,
