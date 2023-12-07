@@ -84,7 +84,7 @@ let options = {
     data: {
       roomMap: {
         roomA: {
-          // id: 'roomA',
+          id: 'roomA',
           name: 'Room A',
           poly: [
             [52.7, 2086],
@@ -94,7 +94,7 @@ let options = {
           ],
         },
         roomB: {
-          // id: 'roomB',
+          id: 'roomB',
           name: 'Room B',
           poly: [
             [60.6, 2235],
@@ -106,7 +106,7 @@ let options = {
           ],
         },
         roomC: {
-          // id: 'roomC',
+          id: 'roomC',
           name: 'Room C',
           poly: [
             [3.4, 2155.6],
