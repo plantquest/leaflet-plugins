@@ -158,59 +158,60 @@ class Room {
     let pqam = self.ctx.pqam
 
     // Data to be moved from rooms to pqam.data
-    let room = pqam.data.roomMap[roomId]
-    let isChosen = pqam.loc.chosen.room && roomId === pqam.loc.chosen.room.room
+    // let room = pqam.data.roomMap[roomId]
+    // let isChosen = pqam.loc.chosen.room && roomId === pqam.loc.chosen.room.room
 
-    if (null == pqam.data.roomMap[roomId] || isChosen) {
-      self.focus(pqam.loc.chosen.room)
-      return
-    }
+    // if (null == pqam.data.roomMap[roomId] || isChosen) {
+    //   self.focus(pqam.loc.chosen.room)
+    //   return
+    // }
+    self.focus(pqam.data.roomMap[roomId])
 
-    if (pqam.loc.poly) {
-      pqam.loc.poly.remove(pqam.layer.room)
-      pqam.loc.poly = null
-    }
-    pqam.loc.room = null
+    // if (pqam.loc.poly) {
+    //   pqam.loc.poly.remove(pqam.layer.room)
+    //   pqam.loc.poly = null
+    // }
+    // pqam.loc.room = null
 
-    if (pqam.loc.chosen.poly && room !== pqam.loc.chosen.room) {
-      pqam.loc.chosen.poly.remove(pqam.layer.room)
-      pqam.loc.chosen.poly = null
-    }
+    // if (pqam.loc.chosen.poly && room !== pqam.loc.chosen.room) {
+    //   pqam.loc.chosen.poly.remove(pqam.layer.room)
+    //   pqam.loc.chosen.poly = null
+    // }
 
-    if (pqam.loc.popup) {
-      pqam.loc.popup.remove(pqam.map)
-      pqam.loc.popop = null
-    }
+    // if (pqam.loc.popup) {
+    //   pqam.loc.popup.remove(pqam.map)
+    //   pqam.loc.popop = null
+    // }
 
-    pqam.loc.chosen.room = room
+    // pqam.loc.chosen.room = room
 
-    let room_poly = self.convertRoomPoly(pqam.config.mapImg, room.poly)
+    // let room_poly = self.convertRoomPoly(pqam.config.mapImg, room.poly)
 
-    pqam.loc.chosen.poly = L.polygon(room_poly, {
-      pane: 'room',
-      color: pqam.config.room.color,
-    })
+    // pqam.loc.chosen.poly = L.polygon(room_poly, {
+    //   pane: 'room',
+    //   color: pqam.config.room.color,
+    // })
 
     // Recursion?
-    pqam.loc.chosen.poly.on('click', () => self.select(room.room))
+    // pqam.loc.chosen.poly.on('click', () => self.select(room.room))
 
-    pqam.loc.chosen.poly.addTo(pqam.layer.room)
+    // pqam.loc.chosen.poly.addTo(pqam.layer.room)
 
-    let roomlatlng: any = self.focus(room)
+    // let roomlatlng: any = self.focus(room)
 
     // convert for popup
-    let roompos_y = self.convert_poly_y(pqam.config.mapImg, roomlatlng[0])
-    let roompos_x = roomlatlng[1]
-    let roompos = self.c_asset_coords(roompos_y - 4, roompos_x + 5)
+    // let roompos_y = self.convert_poly_y(pqam.config.mapImg, roomlatlng[0])
+    // let roompos_x = roomlatlng[1]
+    // let roompos = self.c_asset_coords(roompos_y - 4, roompos_x + 5)
 
     // map focus on room selection
-    pqam.loc.popup = L.popup({
-      autoClose: false,
-      closeOnClick: false,
-    })
-      .setLatLng(roompos)
-      .setContent(pqam.roomPopup(pqam.loc.chosen.room))
-      .openOn(self.ctx.map)
+    // pqam.loc.popup = L.popup({
+    //   autoClose: false,
+    //   closeOnClick: false,
+    // })
+    //   .setLatLng(roompos)
+    //   .setContent(pqam.roomPopup(pqam.loc.chosen.room))
+    //   .openOn(self.ctx.map)
   }
 
   // NOTE: Removed temporarily as part of ongoing development
