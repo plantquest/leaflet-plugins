@@ -125,6 +125,7 @@ class Room {
   }
 
   focus(room: any) {
+    // BUG TODO: Zoom defaults to roomC regardless of click unless rooms are added and removed first
     // Called by select()
     let self = this
     if (null == room) return
@@ -142,7 +143,7 @@ class Room {
     // let roompos_y = self.convert_poly_y(pqam.config.mapImg, roomlatlng[0])
     // let roompos_x = roomlatlng[1]
     // let roompos = self.c_asset_coords(roompos_y, roompos_x - 30)
-    let roompos = room.poly.getCenter()
+    let roompos = self.poly.getCenter()
 
     // self.ctx.map.setView(roompos, pqam.config.mapRoomFocusZoom)
     self.ctx.map.setView(roompos, pqam.config.mapRoomFocusZoom)
