@@ -159,32 +159,32 @@ class Room {
     let pqam = self.ctx.pqam
 
     // Data to be moved from rooms to pqam.data
-    // let room = pqam.data.roomMap[roomId]
-    // let isChosen = pqam.loc.chosen.room && roomId === pqam.loc.chosen.room.room
+    let room = pqam.data.roomMap[roomId]
+    let isChosen = pqam.loc.chosen.room && roomId === pqam.loc.chosen.room.room
 
-    // if (null == pqam.data.roomMap[roomId] || isChosen) {
-    //   self.focus(pqam.loc.chosen.room)
-    //   return
-    // }
+    if (null == pqam.data.roomMap[roomId] || isChosen) {
+      self.focus(pqam.loc.chosen.room)
+      return
+    }
     self.focus(pqam.data.roomMap[roomId])
 
-    // if (pqam.loc.poly) {
-    //   pqam.loc.poly.remove(pqam.layer.room)
-    //   pqam.loc.poly = null
-    // }
-    // pqam.loc.room = null
+    if (pqam.loc.poly) {
+      pqam.loc.poly.remove(pqam.layer.room)
+      pqam.loc.poly = null
+    }
+    pqam.loc.room = null
 
-    // if (pqam.loc.chosen.poly && room !== pqam.loc.chosen.room) {
-    //   pqam.loc.chosen.poly.remove(pqam.layer.room)
-    //   pqam.loc.chosen.poly = null
-    // }
+    if (pqam.loc.chosen.poly && room !== pqam.loc.chosen.room) {
+      pqam.loc.chosen.poly.remove(pqam.layer.room)
+      pqam.loc.chosen.poly = null
+    }
 
-    // if (pqam.loc.popup) {
-    //   pqam.loc.popup.remove(pqam.map)
-    //   pqam.loc.popop = null
-    // }
+    if (pqam.loc.popup) {
+      pqam.loc.popup.remove(pqam.map)
+      pqam.loc.popop = null
+    }
 
-    // pqam.loc.chosen.room = room
+    pqam.loc.chosen.room = room
 
     // let room_poly = self.convertRoomPoly(pqam.config.mapImg, room.poly)
 
