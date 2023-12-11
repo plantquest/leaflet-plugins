@@ -1,15 +1,11 @@
 import L from 'leaflet';
 import 'leaflet.markercluster';
 
-import './asset-display.css';
-
-interface Asset {
+export interface Asset {
   id: string;
   x: number;
   y: number;
   value: number;
-  color: string;
-  borderColor: string;
 }
 
 interface AssetDisplayOptions extends L.ControlOptions {
@@ -20,21 +16,21 @@ interface CustomMarker extends L.Marker {
   assetValue?: number;
 }
 
-const PlantquestAssetDisplay = L.Control.extend({
+export const PlantquestAssetDisplay = L.Control.extend({
   options: {} as AssetDisplayOptions,
   _map: null as L.Map | null,
-  clusterLayer: null as L.MarkerClusterGroup | null,
 
   initialize: function (options: AssetDisplayOptions) {
     L.Util.setOptions(this, options);
-    this.clusterLayer = L.markerClusterGroup(); 
   },
 
   onAdd: function (map: L.Map) {
     this._map = map;
-    const markers = L.markerClusterGroup({
-      maxClusterRadius: 10,
+    const clusterGroup = L.markerClusterGroup({
+      maxClusterRadius: 40, // Adjust this value as needed
+      spiderfyOnMaxZoom: true,
       iconCreateFunction: function(cluster) {
+        console.log("Cluster being created with markers:", cluster.getAllChildMarkers());
         const childMarkers = cluster.getAllChildMarkers() as CustomMarker[];
         let sum = 0;
         childMarkers.forEach(marker => {
@@ -50,39 +46,29 @@ const PlantquestAssetDisplay = L.Control.extend({
       }
     });
 
+    console.log('this.options', this.options)
     this.options.assets.forEach(asset => {
-      const marker = L.marker([asset.y, asset.x], {
-        icon: L.divIcon({
-          html: `<div class="asset-marker" style="background-color: ${asset.color}; border-color: ${asset.borderColor};">${asset.value}</div>`,
-          className: 'marker-asset',
-          iconSize: L.point(30, 30)
-        })
-      }) as CustomMarker;
-      marker.assetValue = asset.value;
-      markers.addLayer(marker);
+      if (typeof asset.x === 'number' && typeof asset.y === 'number') {
+        const marker = L.marker([asset.y, asset.x], {
+          icon: L.divIcon({
+            html: `<div class="asset-marker">${asset.value}</div>`,
+            className: 'marker-asset',
+            iconSize: L.point(30, 30)
+          })
+        }) as CustomMarker;
+        marker.assetValue = asset.value;
+        console.log('marker', marker);
+        clusterGroup.addLayer(marker);
+      } else {
+        console.error('Invalid asset coordinates:', asset);
+      }
     });
 
-    map.addLayer(markers);
+    map.addLayer(clusterGroup);
     return L.DomUtil.create('div', 'asset-display-container');
   },
 
   onRemove: function (_map: L.Map) {
     // Clean up if needed
-  },
-  getClusterLayer: function() {
-    return this.clusterLayer;
-  },
-  hideClusters: function() {
-    if (this._map && this.clusterLayer) {
-      this._map.removeLayer(this.clusterLayer);
-    }
-  },
-
-  showClusters: function() {
-    if (this._map && this.clusterLayer) {
-      this._map.addLayer(this.clusterLayer);
-    }
-  },
+  }
 });
-
-export { PlantquestAssetDisplay };
