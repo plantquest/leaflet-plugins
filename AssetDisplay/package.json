@@ -40,6 +40,7 @@
     "vitest": "^0.34.6"
   },
   "dependencies": {
+    "leaflet-rastercoords": "^1.0.6",
     "leaflet.markercluster": "^1.5.3"
   }
 }
