@@ -146,7 +146,7 @@ class Room {
     let roompos = self.poly.getCenter()
 
     // self.ctx.map.setView(roompos, pqam.config.mapRoomFocusZoom)
-    self.ctx.map.setView(roompos, pqam.config.mapRoomFocusZoom)
+    self.ctx.map.flyTo(roompos, pqam.config.mapRoomFocusZoom)
 
     // Originally returns roomlatlng
     return roompos
@@ -315,7 +315,7 @@ class Room {
   demoSelect() {
     let self = this
     let roomCenter = self.poly.getCenter()
-    self.ctx.map.flyTo(roomCenter, 4)
+    self.ctx.map.flyTo(roomCenter, self.ctx.pqam.config.mapRoomFocusZoom)
 
     let tooltip = L.tooltip({
       permanent: true,
