@@ -172,8 +172,6 @@ class Room {
     }
     // Proceeding given that either no room chosen yet or there is data in roomMap
 
-    // self.focus(pqam.data.roomMap[roomId])
-
     // loc.poly is set in pqam self.checkRooms()
     // checkRooms() only called in setInterval() method if self.config.room?.outline?.active is truthy
     // Has a tooltip bound to it (room name)
