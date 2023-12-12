@@ -148,7 +148,8 @@ class Room {
     // self.ctx.map.setView(roompos, pqam.config.mapRoomFocusZoom)
     self.ctx.map.setView(roompos, pqam.config.mapRoomFocusZoom)
 
-    // return roomlatlng
+    // Originally returns roomlatlng
+    return roompos
   }
 
   select(roomId: any, opts?: any) {
@@ -158,47 +159,72 @@ class Room {
 
     let pqam = self.ctx.pqam
 
-    // Data to be moved from rooms to pqam.data
+    // Room is a Room obj
     let room = pqam.data.roomMap[roomId]
-    let isChosen = pqam.loc.chosen.room && roomId === pqam.loc.chosen.room.room
+    // isChosen is a boolean
+    // room.poly originally room.room
+    let isChosen = pqam.loc.chosen.room && roomId === pqam.loc.chosen.room.poly
 
+    // Focus on chosen room and return if isChosen is truthy OR if no data
     if (null == pqam.data.roomMap[roomId] || isChosen) {
       self.focus(pqam.loc.chosen.room)
       return
     }
-    self.focus(pqam.data.roomMap[roomId])
+    // Proceeding given that either no room chosen yet or there is data in roomMap
 
+    // self.focus(pqam.data.roomMap[roomId])
+
+    // loc.poly is set in pqam self.checkRooms()
+    // checkRooms() only called in setInterval() method if self.config.room?.outline?.active is truthy
+    // Has a tooltip bound to it (room name)
     if (pqam.loc.poly) {
+      // Polygon remove() method does NOT have arguments
       pqam.loc.poly.remove(pqam.layer.room)
       pqam.loc.poly = null
     }
+
+    // Resets loc.room to null regardless of if value exists already or not
     pqam.loc.room = null
 
+    // If chosen.poly is truthy AND room does not match chosen room (which could be null at this point)
     if (pqam.loc.chosen.poly && room !== pqam.loc.chosen.room) {
+      // Polygon remove() method does NOT have arguments
       pqam.loc.chosen.poly.remove(pqam.layer.room)
       pqam.loc.chosen.poly = null
     }
 
+    // Just remove popup from loc obj
     if (pqam.loc.popup) {
+      // Popup remove() method does NOT have arguments
       pqam.loc.popup.remove(pqam.map)
       pqam.loc.popop = null
     }
 
+    // Finally assigning chosen room
     pqam.loc.chosen.room = room
 
+    // Leaving commented until room coords need converting
     // let room_poly = self.convertRoomPoly(pqam.config.mapImg, room.poly)
 
-    // pqam.loc.chosen.poly = L.polygon(room_poly, {
-    //   pane: 'room',
-    //   color: pqam.config.room.color,
-    // })
+    // 'room' originally 'room_poly'
+    // Should be room or self.poly?
+    // Creating room polygon, assigning to chosen.poly
+    pqam.loc.chosen.poly = L.polygon(room, {
+      pane: 'room',
+      color: pqam.config.room.color,
+    })
 
     // Recursion?
-    // pqam.loc.chosen.poly.on('click', () => self.select(room.room))
+    // Originally self.select(room.room)
+    // Should poly be called room?
+    pqam.loc.chosen.poly.on('click', () => self.select(room.poly))
 
-    // pqam.loc.chosen.poly.addTo(pqam.layer.room)
+    // Originally .addTo(pqam.layer.room)
+    // Only one layer (the map) in this current setup
+    pqam.loc.chosen.poly.addTo(self.ctx.map)
 
     // let roomlatlng: any = self.focus(room)
+    let roompos: any = self.focus(room)
 
     // convert for popup
     // let roompos_y = self.convert_poly_y(pqam.config.mapImg, roomlatlng[0])
@@ -206,13 +232,15 @@ class Room {
     // let roompos = self.c_asset_coords(roompos_y - 4, roompos_x + 5)
 
     // map focus on room selection
-    // pqam.loc.popup = L.popup({
-    //   autoClose: false,
-    //   closeOnClick: false,
-    // })
-    //   .setLatLng(roompos)
-    //   .setContent(pqam.roomPopup(pqam.loc.chosen.room))
-    //   .openOn(self.ctx.map)
+    // Set popup location to room centre
+    // Set popup content to loc.chosen.room details
+    pqam.loc.popup = L.popup({
+      autoClose: false,
+      closeOnClick: false,
+    })
+      .setLatLng(roompos)
+      .setContent(self.roomPopup(pqam.loc.chosen.room))
+      .openOn(self.ctx.map)
   }
 
   // NOTE: Removed temporarily as part of ongoing development
@@ -307,6 +335,15 @@ class Room {
   }
 
   // Utility functions here for dev
+
+  roomPopup = function (room: any) {
+    let html = []
+
+    // Originally room.room
+    html.push('<h2 class="plantquest-room-popup">', room.poly, '</h2>')
+
+    return html.join('\n')
+  }
 
   convert_poly_y(img: any, y: any) {
     let self = this
