@@ -22,6 +22,8 @@ map.createPane('room')
 let roomPane = map.getPane('room')
 roomPane.style.zIndex = 230
 
+// 'rooms' object outdated in favour of pqam.data.roomMap object
+// Left in for development in progress purposes
 let options = {
   debug: true,
   rooms: [
@@ -64,7 +66,7 @@ let options = {
       room: null,
       chosen: {
         poly: null,
-        room: null,
+        room: { poly: null },
       },
     },
     config: {
