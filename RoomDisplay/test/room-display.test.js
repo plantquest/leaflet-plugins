@@ -141,4 +141,55 @@ describe('RoomDisplay', () => {
     plantquestRoomDisplay3.remove()
     expect(plantquestRoomDisplay3._map).toEqual(null)
   })
+
+  test('room-display-on-click', () => {
+    let map5 = L.map(document.createElement('div'), {
+      minZoom: 1.7,
+    }).setView([50.154377, 2154.375], 1.7)
+
+    L.tileLayer(
+      'https://plantquest-demo01-map01.s3.eu-west-1.amazonaws.com/tiles/pqd-pq01-m01-013/{z}/{x}/{y}.png'
+    ).addTo(map5)
+
+    map5.createPane('room')
+    let roomPane4 = map5.getPane('room')
+    roomPane4.style.zIndex = 230
+
+    let plantquestRoomDisplay4 = new PlantquestRoomDisplay(options)
+    plantquestRoomDisplay4.addTo(map5)
+  })
+
+  test('room-display-focus', () => {
+    let map6 = L.map(document.createElement('div'), {
+      minZoom: 1.7,
+    }).setView([50.154377, 2154.375], 1.7)
+
+    L.tileLayer(
+      'https://plantquest-demo01-map01.s3.eu-west-1.amazonaws.com/tiles/pqd-pq01-m01-013/{z}/{x}/{y}.png'
+    ).addTo(map6)
+
+    map6.createPane('room')
+    let roomPane5 = map6.getPane('room')
+    roomPane5.style.zIndex = 230
+
+    let plantquestRoomDisplay5 = new PlantquestRoomDisplay(options)
+    plantquestRoomDisplay5.addTo(map6)
+  })
+
+  test('room-display-select', () => {
+    let map7 = L.map(document.createElement('div'), {
+      minZoom: 1.7,
+    }).setView([50.154377, 2154.375], 1.7)
+
+    L.tileLayer(
+      'https://plantquest-demo01-map01.s3.eu-west-1.amazonaws.com/tiles/pqd-pq01-m01-013/{z}/{x}/{y}.png'
+    ).addTo(map7)
+
+    map7.createPane('room')
+    let roomPane6 = map7.getPane('room')
+    roomPane6.style.zIndex = 230
+
+    let plantquestRoomDisplay6 = new PlantquestRoomDisplay(options)
+    plantquestRoomDisplay6.addTo(map7)
+  })
 })
