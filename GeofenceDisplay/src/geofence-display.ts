@@ -7,7 +7,6 @@ interface GeofenceDef {
   id: string
   title: string
   latlngs: Array<Array<string>>
-  colour: string
 }
 
 interface PlantquestGeofenceDisplayOptions extends L.ControlOptions {
@@ -43,7 +42,7 @@ const PlantquestGeofenceDisplay = L.Layer.extend({
     self.options.geofences.forEach((geo: any) => {
       let geofence = new Geofence(geo, {
         map: _map,
-        cfg: { geofence: { click: { active: true } } },
+        cfg: self.options.pqam.config,
       })
       self._state.geofenceByID[geo.id] = geofence
       self.showGeofence(geofence, true)
@@ -107,7 +106,10 @@ class Geofence {
   constructor(ent: any, ctx: any) {
     this.ent = ent
     this.ctx = ctx
-    this.poly = L.polygon(ent.latlngs, { pane: ent.pane, color: ent.colour })
+    this.poly = L.polygon(ent.latlngs, {
+      pane: 'geofence',
+      color: this.ctx.cfg.geofence.colour,
+    })
   }
 
   show() {
@@ -117,11 +119,12 @@ class Geofence {
       self.poly.on('click', self.onClick.bind(self))
     }
 
+    // TODO: tooltip options passed into plugin
     let tooltip = L.tooltip({
       pane: 'geofenceLabel',
       permanent: true,
-      direction: 'center',
-      opacity: 1,
+      direction: 'bottom',
+      opacity: 0.8,
       className: 'polygon-labels',
     })
 

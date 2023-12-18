@@ -1,7 +1,7 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 (function (global){(function (){
 (function(global2, factory) {
-  typeof exports === "object" && typeof module !== "undefined" ? factory(exports) : typeof define === "function" && define.amd ? define(["exports"], factory) : (global2 = typeof globalThis !== "undefined" ? globalThis : global2 || self, factory(global2.PlantquestGeofenceDisplay = {}));
+  typeof exports === "object" && typeof module !== "undefined" ? factory(exports) : typeof define === "function" && define.amd ? define(["exports"], factory) : (global2 = typeof globalThis !== "undefined" ? globalThis : global2 || self, factory(global2.PlantquestBuildingDisplay = {}));
 })(this, function(exports2) {
   "use strict";var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
@@ -10173,117 +10173,480 @@ var __publicField = (obj, key, value) => {
   })(gubu_min$2, gubu_min$2.exports);
   var gubu_minExports = gubu_min$2.exports;
   const gubu_min$1 = /* @__PURE__ */ getDefaultExportFromCjs(gubu_minExports);
-  const geofenceDisplay = "";
-  const PlantquestGeofenceDisplay = L$1.Layer.extend({
+  /**
+   * leaflet plugin for plain image map projection
+   * @copyright 2016- commenthol
+   * @license MIT
+   */
+  class RasterCoords {
+    constructor({
+      map,
+      imgsize,
+      tilesize = 256,
+      setmaxbounds = true
+    }) {
+      __publicField(this, "map");
+      __publicField(this, "width");
+      __publicField(this, "height");
+      __publicField(this, "tilesize");
+      __publicField(this, "zoom");
+      this.map = map;
+      this.width = imgsize[0];
+      this.height = imgsize[1];
+      this.tilesize = tilesize;
+      this.zoom = this.zoomLevel();
+      if (setmaxbounds && this.width && this.height) {
+        this.setMaxBounds();
+      }
+    }
+    /**
+     * calculate accurate zoom level for the given image size
+     */
+    zoomLevel() {
+      return Math.ceil(
+        Math.log(Math.max(this.width, this.height) / this.tilesize) / Math.log(2)
+      );
+    }
+    /**
+     * unproject `coords` to the raster coordinates used by the raster image projection
+     * @param {Array} coords - [ x, y ]
+     * @return {L.LatLng} - internal coordinates
+     */
+    unproject(coords) {
+      return this.map.unproject(coords, this.zoom);
+    }
+    /**
+     * project `coords` back to image coordinates
+     * @param {Array} coords - [ x, y ]
+     * @return {L.LatLng} - image coordinates
+     */
+    project(coords) {
+      return this.map.project(coords, this.zoom);
+    }
+    /**
+     * get the max bounds of the image
+     */
+    getMaxBounds() {
+      const southWest = this.unproject([0, this.height]);
+      const northEast = this.unproject([this.width, 0]);
+      return new leafletSrcExports.LatLngBounds(southWest, northEast);
+    }
+    /**
+     * sets the max bounds on map
+     */
+    setMaxBounds() {
+      const bounds = this.getMaxBounds();
+      this.map.setMaxBounds(bounds);
+    }
+  }
+  const buildingDisplay = "";
+  const PlantquestBuildingDisplay = L$1.Layer.extend({
     initialize: function(rawOptions) {
-      const PlantquestGeofenceDisplayOptionsShape = gubu_minExports.Gubu({});
-      let options = PlantquestGeofenceDisplayOptionsShape(rawOptions);
-      options.debug && console.log("GeofenceDisplay init function called.");
+      const PlantquestBuildingDisplayOptionsShape = gubu_minExports.Gubu({});
+      let options = PlantquestBuildingDisplayOptionsShape(rawOptions);
+      options.debug && console.log("BuildingDisplay init function called.");
       L$1.Util.setOptions(this, options);
       this._state = {
         zindex: 0,
-        geofenceByID: {}
+        buildingByID: {}
       };
     },
     onAdd: function(_map) {
       let self2 = this;
-      self2.options.debug && console.log("GeofenceDisplay onAdd function called.");
+      self2.options.debug && console.log("BuildingDisplay onAdd function called.");
       self2.options.debug && console.log(
-        "Local geofence variable before add:",
-        self2._state.geofenceByID
+        "Local building variable before add:",
+        self2._state.buildingByID
       );
-      self2.options.geofences.forEach((geo) => {
-        let geofence = new Geofence(geo, {
+      self2.options.buildings.forEach((bui) => {
+        let building = new Building(bui, {
           map: _map,
-          cfg: self2.options.pqam.config
+          cfg: self2.options.pqam.config,
+          pqam: self2.options.pqam
         });
-        self2._state.geofenceByID[geo.id] = geofence;
-        self2.showGeofence(geofence, true);
+        self2._state.buildingByID[bui.id] = building;
+        self2.showBuilding(building, true);
       });
       self2.options.debug && console.log(
-        "Local geofence variable after add:",
-        self2._state.geofenceByID
+        "Local building variable after add:",
+        self2._state.buildingByID
       );
+      console.log("map:", _map);
     },
     onRemove: function(_map) {
       let self2 = this;
-      self2.options.debug && console.log("GeofenceDisplay onRemove function called.");
+      self2.options.debug && console.log("BuildingDisplay onRemove function called.");
       self2.options.debug && console.log(
-        "Local geofence variable before remove:",
-        self2._state.geofenceByID
+        "Local building variable before remove:",
+        self2._state.buildingByID
       );
-      self2.clearGeofences();
+      self2.clearBuildings();
       self2.options.debug && console.log(
-        "Local geofence variable after remove:",
-        self2._state.geofenceByID
+        "Local building variable after remove:",
+        self2._state.buildingByID
       );
     },
-    showGeofence: function(geofence, show) {
-      if (null == geofence) {
+    showBuilding: function(building, show) {
+      if (null == building) {
         return;
       }
       show = !!show;
       if (true === show) {
-        geofence.show();
+        building.show();
       } else if (false === show) {
-        geofence.hide();
+        building.hide();
       }
     },
-    clearGeofences: function() {
+    clearBuildings: function() {
       let self2 = this;
-      for (let geofenceID in self2._state.geofenceByID) {
-        let geofence = self2._state.geofenceByID[geofenceID];
-        delete self2._state.geofenceByID[geofenceID];
-        if (geofence && geofence.hide) {
-          geofence.hide();
+      for (let buildingID in self2._state.buildingByID) {
+        let building = self2._state.buildingByID[buildingID];
+        delete self2._state.buildingByID[buildingID];
+        if (building && building.hide) {
+          building.hide();
         }
       }
+    },
+    resetDemoSelect: function(_map) {
+      _map.setView([50.154377, 2154.375], 1.7);
     }
   });
-  class Geofence {
+  class Building {
     constructor(ent, ctx) {
       __publicField(this, "ent", null);
       __publicField(this, "ctx", null);
       __publicField(this, "poly");
+      __publicField(this, "cfgbuilding", null);
+      __publicField(this, "label", null);
+      // Utility functions here for dev
+      __publicField(this, "buildingPopup", function(building) {
+        let html = [];
+        html.push('<h2 class="plantquest-building-popup">', building.poly, "</h2>");
+        return html.join("\n");
+      });
       this.ent = ent;
       this.ctx = ctx;
-      this.poly = L$1.polygon(ent.latlngs, {
-        pane: "geofence",
-        color: this.ctx.cfg.geofence.colour
+      this.cfgbuilding = ctx.cfg.building;
+      this.poly = L$1.polygon(ent.poly, {
+        pane: "building",
+        color: this.cfgbuilding.color
       });
     }
     show() {
       let self2 = this;
-      if (self2.ctx.cfg.geofence.click.active) {
+      if (self2.cfgbuilding.click.active) {
         self2.poly.on("click", self2.onClick.bind(self2));
       }
-      let tooltip = L$1.tooltip({
-        pane: "geofenceLabel",
-        permanent: true,
-        direction: "bottom",
-        opacity: 0.8,
-        className: "polygon-labels"
-      });
-      self2.poly.bindTooltip(tooltip);
-      tooltip.setContent(
-        `<div class="leaflet-zoom-animated plantquest-geofence-label ">${self2.ent.title}</div>`
-      );
       self2.poly.addTo(self2.ctx.map);
     }
     hide() {
       let self2 = this;
       self2.poly && self2.poly.remove();
     }
+    focus(building) {
+      let self2 = this;
+      if (null == building)
+        return;
+      let pqam = self2.ctx.pqam;
+      let buildingpos = self2.poly.getCenter();
+      self2.ctx.map.flyTo(buildingpos, pqam.config.mapBuildingFocusZoom);
+      return buildingpos;
+    }
+    select(buildingId, opts) {
+      let self2 = this;
+      opts = opts || {};
+      let pqam = self2.ctx.pqam;
+      let building = pqam.data.buildingMap[buildingId];
+      let isChosen = pqam.loc.chosen.building && buildingId === pqam.loc.chosen.building.poly;
+      if (null == pqam.data.buildingMap[buildingId] || isChosen) {
+        self2.focus(pqam.loc.chosen.building);
+        return;
+      }
+      if (pqam.loc.poly) {
+        pqam.loc.poly.remove(pqam.layer.building);
+        pqam.loc.poly = null;
+      }
+      pqam.loc.building = null;
+      if (pqam.loc.chosen.poly && building !== pqam.loc.chosen.building) {
+        pqam.loc.chosen.poly.remove(pqam.layer.building);
+        pqam.loc.chosen.poly = null;
+      }
+      if (pqam.loc.popup) {
+        pqam.loc.popup.remove(pqam.map);
+        pqam.loc.popop = null;
+      }
+      pqam.loc.chosen.building = building;
+      pqam.loc.chosen.poly = L$1.polygon(building, {
+        pane: "building",
+        color: pqam.config.building.color
+      });
+      pqam.loc.chosen.poly.on("click", () => self2.select(building.poly));
+      pqam.loc.chosen.poly.addTo(self2.ctx.map);
+      let buildingpos = self2.focus(building);
+      pqam.loc.popup = L$1.popup({
+        autoClose: false,
+        closeOnClick: false
+      }).setLatLng(buildingpos).setContent(self2.buildingPopup(pqam.loc.chosen.building)).openOn(self2.ctx.map);
+    }
+    // NOTE: Removed temporarily as part of ongoing development
+    // Originally took layer as param
+    // onZoom(zoom: any, mapID: any) {
+    //   // Called by zoomEndRender() [temp]
+    //   // which is called by PQAM map instance and focus()?
+    //   let self = this
+    //   let mapMatch = 1 + parseInt(mapID) == parseInt(self.ent.map)
+    //   let showBuildingLabel = 1 === parseInt(self.ent.showlabel)
+    //   let showNameZoom =
+    //     null == self.cfgbuilding.label.zoom
+    //       ? self.ctx.cfg.mapMaxZoom
+    //       : self.cfgbuilding.label.zoom
+    //   let showLabel = showNameZoom <= zoom && mapMatch && showBuildingLabel
+    //   let shown = false
+    //   if (showLabel) {
+    //     if (null == self.label && self.ent.poly) {
+    //       self.label = L.polygon(
+    //         self.convertBuildingPoly(self.ctx.cfg.mapImg, self.ent.poly),
+    //         {
+    //           color: 'transparent',
+    //           pane: 'buildingLabel',
+    //           interactive: false,
+    //         }
+    //       )
+    //       self.label.name$ = 'BUILDING:' + self.ent.name
+    //       let tooltip = L.tooltip({
+    //         permanent: true,
+    //         direction: 'center',
+    //         opacity: 1,
+    //         className: 'polygon-labels',
+    //       })
+    //       tooltip.setContent(
+    //         '<div class="' +
+    //           'xleaflet-zoom-animated ' +
+    //           'plantquest-building-label ' +
+    //           `">${self.ent.name}</div>`
+    //       )
+    //       self.label.bindTooltip(tooltip)
+    //     }
+    //     if (self.ctx.map) {
+    //       self.label.addTo(self.ctx.map)
+    //       shown = true
+    //     }
+    //   } else {
+    //     if (null != self.label) {
+    //       self.label.remove()
+    //     }
+    //   }
+    //   return shown
+    // }
     onClick(event) {
+      let self2 = this;
       console.log("onClick", event);
+      self2.select(self2.ent.id);
+    }
+    demoSelect() {
+      let self2 = this;
+      let buildingCenter = self2.poly.getCenter();
+      self2.ctx.map.flyTo(
+        buildingCenter,
+        self2.ctx.pqam.config.mapBuildingFocusZoom
+      );
+      let tooltip = L$1.tooltip({
+        permanent: true,
+        direction: "center",
+        opacity: 1,
+        className: "polygon-labels"
+      });
+      self2.poly.bindTooltip(tooltip);
+      tooltip.setContent(
+        `<div class="xleaflet-zoom-animated plantquest-building-label ">${self2.ent.name}</div>`
+      );
+    }
+    convert_poly_y(img, y) {
+      let self2 = this;
+      self2.ent.debug && console.log("Utility function convert_poly_y called.");
+      return img[1] - y;
+    }
+    c_asset_coords(x, y) {
+      let self2 = this;
+      self2.ent.debug && console.log("Utility function c_asset_coords called.");
+      let rc = new RasterCoords({
+        map: self2.ctx.map,
+        imgsize: self2.ctx.pqam.config.mapImg
+      });
+      return rc.unproject([x, y]);
+    }
+    convertBuildingPoly(img, poly) {
+      let self2 = this;
+      self2.ent.debug && console.log("Utility function convertBuildingPoly called.");
+      let p = [];
+      let rc = new RasterCoords({
+        map: self2.ctx.map,
+        imgsize: self2.ctx.pqam.config.mapImg
+      });
+      for (let part of poly) {
+        p.push(rc.unproject([part[1], img[1] - part[0]]));
+      }
+      return p;
     }
   }
-  exports2.PlantquestGeofenceDisplay = PlantquestGeofenceDisplay;
+  exports2.PlantquestBuildingDisplay = PlantquestBuildingDisplay;
   Object.defineProperty(exports2, Symbol.toStringTag, { value: "Module" });
 });
 
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],2:[function(require,module,exports){
+let Leaflet = require('../../verify/leaflet.js')
+let { PlantquestBuildingDisplay } = require('../dist/building-display.umd.cjs')
+
+describe('BuildingDisplay', () => {
+  const options = {
+    debug: true,
+    buildings: [
+      {
+        id: 'buildingA',
+        name: 'Building A',
+        poly: [
+          [52.7, 2086],
+          [52.7, 2115.7],
+          [47.4, 2115.7],
+          [47.4, 2086],
+        ],
+      },
+      {
+        id: 'buildingB',
+        name: 'Building B',
+        poly: [
+          [60.6, 2235],
+          [60.6, 2255.3],
+          [58.3, 2255.3],
+          [58.3, 2252],
+          [56.1, 2252],
+          [56.1, 2235],
+        ],
+      },
+      {
+        id: 'buildingC',
+        name: 'Building C',
+        poly: [
+          [3.4, 2155.6],
+          [3.4, 2172.5],
+          [-3.4, 2172.5],
+          [-3.4, 2155.6],
+        ],
+      },
+    ],
+    pqam: {
+      loc: {
+        poly: null,
+        building: null,
+        chosen: {
+          poly: null,
+          building: null,
+        },
+      },
+      config: {
+        mapImg: [7800, 5850],
+        mapMaxZoom: 2,
+        mapBuildingFocusZoom: 5,
+        building: {
+          click: {
+            active: true,
+          },
+          label: {
+            zoom: null,
+          },
+          color: '#33f',
+        },
+      },
+      data: {
+        buildingMap: { buildingA: null, buildingB: null, buildingC: null },
+      },
+      layer: { building: null },
+      map: null,
+      buildingPopup: null,
+      click: null,
+    },
+  }
+
+  test('leaflet-happy', () => {
+    expect(Leaflet).toBeDefined()
+  })
+
+  test('leaflet-map-happy', () => {
+    let map1 = L.map(document.createElement('div'))
+    expect(map1).toBeDefined()
+  })
+
+  test('leaflet-map-prep', () => {
+    let map2 = L.map(document.createElement('div'), {
+      minZoom: 1.7,
+    }).setView([50.154377, 2154.375], 1.7)
+
+    L.tileLayer(
+      'https://plantquest-demo01-map01.s3.eu-west-1.amazonaws.com/tiles/pqd-pq01-m01-013/{z}/{x}/{y}.png'
+    ).addTo(map2)
+
+    map2.createPane('building')
+    let buildingPane1 = map2.getPane('building')
+    buildingPane1.style.zIndex = 230
+
+    expect(map2._panes.building).toBeDefined()
+  })
+
+  test('building-display-happy', () => {
+    expect(PlantquestBuildingDisplay).toBeDefined()
+  })
+
+  test('building-display-create', () => {
+    let plantquestBuildingDisplay1 = new PlantquestBuildingDisplay(options)
+    expect(plantquestBuildingDisplay1._state).toBeDefined()
+  })
+
+  test('building-display-add-buildings', () => {
+    let map3 = L.map(document.createElement('div'), {
+      minZoom: 1.7,
+    }).setView([50.154377, 2154.375], 1.7)
+
+    L.tileLayer(
+      'https://plantquest-demo01-map01.s3.eu-west-1.amazonaws.com/tiles/pqd-pq01-m01-013/{z}/{x}/{y}.png'
+    ).addTo(map3)
+
+    map3.createPane('building')
+    let buildingPane2 = map3.getPane('building')
+    buildingPane2.style.zIndex = 230
+
+    let plantquestBuildingDisplay2 = new PlantquestBuildingDisplay(options)
+    expect(plantquestBuildingDisplay2._map).toBeUndefined()
+    plantquestBuildingDisplay2.addTo(map3)
+    expect(plantquestBuildingDisplay2._map).toBeDefined()
+  })
+
+  test('building-display-remove-buildings', () => {
+    let map4 = L.map(document.createElement('div'), {
+      minZoom: 1.7,
+    }).setView([50.154377, 2154.375], 1.7)
+
+    L.tileLayer(
+      'https://plantquest-demo01-map01.s3.eu-west-1.amazonaws.com/tiles/pqd-pq01-m01-013/{z}/{x}/{y}.png'
+    ).addTo(map4)
+
+    map4.createPane('building')
+    let buildingPane3 = map4.getPane('building')
+    buildingPane3.style.zIndex = 230
+
+    let plantquestBuildingDisplay3 = new PlantquestBuildingDisplay(options)
+    plantquestBuildingDisplay3.addTo(map4)
+    expect(plantquestBuildingDisplay3._map).toBeDefined()
+    plantquestBuildingDisplay3.remove()
+    expect(plantquestBuildingDisplay3._map).toEqual(null)
+  })
+})
+
+},{"../../verify/leaflet.js":6,"../dist/building-display.umd.cjs":1}],3:[function(require,module,exports){
+require('../../verify/jester.js')
+require('./building-display.test.js')
+
+},{"../../verify/jester.js":5,"./building-display.test.js":2}],4:[function(require,module,exports){
 /* @preserve
  * Leaflet 1.9.4, a JS library for interactive maps. https://leafletjs.com
  * (c) 2010-2023 Vladimir Agafonkin, (c) 2010-2011 CloudMade
@@ -24797,142 +25160,7 @@ var __publicField = (obj, key, value) => {
 }));
 
 
-},{}],3:[function(require,module,exports){
-require('../../verify/jester.js')
-require('./geofence-display.test.js')
-
-},{"../../verify/jester.js":5,"./geofence-display.test.js":4}],4:[function(require,module,exports){
-let Leaflet = require('../../verify/leaflet.js')
-let { PlantquestGeofenceDisplay } = require('../dist/geofence-display.umd.cjs')
-
-describe('GeofenceDisplay', () => {
-  const options = {
-    debug: true,
-    geofences: [
-      {
-        id: 'buildingA',
-        title: 'Building A',
-        latlngs: [
-          [52.7, 2086],
-          [52.7, 2115.7],
-          [47.4, 2115.7],
-          [47.4, 2086],
-        ],
-      },
-      {
-        id: 'buildingB',
-        title: 'Building B',
-        latlngs: [
-          [60.6, 2235],
-          [60.6, 2255.3],
-          [58.3, 2255.3],
-          [58.3, 2252],
-          [56.1, 2252],
-          [56.1, 2235],
-        ],
-      },
-      {
-        id: 'buildingC',
-        title: 'Building C',
-        latlngs: [
-          [3.4, 2155.6],
-          [3.4, 2172.5],
-          [-3.4, 2172.5],
-          [-3.4, 2155.6],
-        ],
-      },
-    ],
-    pqam: { config: { geofence: { click: { active: true }, color: '#f3f' } } },
-  }
-
-  test('leaflet-happy', () => {
-    expect(Leaflet).toBeDefined()
-  })
-
-  test('leaflet-map-happy', () => {
-    let map1 = L.map(document.createElement('div'))
-    expect(map1).toBeDefined()
-  })
-
-  test('leaflet-map-prep', () => {
-    let map2 = L.map(document.createElement('div'), {
-      minZoom: 1.7,
-    }).setView([50.154377, 2154.375], 1.7)
-
-    L.tileLayer(
-      'https://plantquest-demo01-map01.s3.eu-west-1.amazonaws.com/tiles/pqd-pq01-m01-013/{z}/{x}/{y}.png'
-    ).addTo(map2)
-
-    map2.createPane('geofence')
-    let geofencePane1 = map2.getPane('geofence')
-    geofencePane1.style.zIndex = 230
-
-    map2.createPane('geofenceLabel')
-    let geofenceLabelPane1 = map2.getPane('geofenceLabel')
-    geofenceLabelPane1.style.zIndex = 235
-
-    expect(map2._panes.geofence).toBeDefined()
-    expect(map2._panes.geofenceLabel).toBeDefined()
-  })
-
-  test('geofence-display-happy', () => {
-    expect(PlantquestGeofenceDisplay).toBeDefined()
-  })
-
-  test('geofence-display-create', () => {
-    let plantquestGeofenceDisplay1 = new PlantquestGeofenceDisplay(options)
-    expect(plantquestGeofenceDisplay1._state).toBeDefined()
-  })
-
-  test('geofence-display-add-geofences', () => {
-    let map3 = L.map(document.createElement('div'), {
-      minZoom: 1.7,
-    }).setView([50.154377, 2154.375], 1.7)
-
-    L.tileLayer(
-      'https://plantquest-demo01-map01.s3.eu-west-1.amazonaws.com/tiles/pqd-pq01-m01-013/{z}/{x}/{y}.png'
-    ).addTo(map3)
-
-    map3.createPane('geofence')
-    let geofencePane2 = map3.getPane('geofence')
-    geofencePane2.style.zIndex = 230
-
-    map3.createPane('geofenceLabel')
-    let geofenceLabelPane2 = map3.getPane('geofenceLabel')
-    geofenceLabelPane2.style.zIndex = 235
-
-    let plantquestGeofenceDisplay2 = new PlantquestGeofenceDisplay(options)
-    expect(plantquestGeofenceDisplay2._map).toBeUndefined()
-    plantquestGeofenceDisplay2.addTo(map3)
-    expect(plantquestGeofenceDisplay2._map).toBeDefined()
-  })
-
-  test('geofence-display-remove-geofences', () => {
-    let map4 = L.map(document.createElement('div'), {
-      minZoom: 1.7,
-    }).setView([50.154377, 2154.375], 1.7)
-
-    L.tileLayer(
-      'https://plantquest-demo01-map01.s3.eu-west-1.amazonaws.com/tiles/pqd-pq01-m01-013/{z}/{x}/{y}.png'
-    ).addTo(map4)
-
-    map4.createPane('geofence')
-    let geofencePane3 = map4.getPane('geofence')
-    geofencePane3.style.zIndex = 230
-
-    map4.createPane('geofenceLabel')
-    let geofenceLabelPane3 = map4.getPane('geofenceLabel')
-    geofenceLabelPane3.style.zIndex = 235
-
-    let plantquestGeofenceDisplay3 = new PlantquestGeofenceDisplay(options)
-    plantquestGeofenceDisplay3.addTo(map4)
-    expect(plantquestGeofenceDisplay3._map).toBeDefined()
-    plantquestGeofenceDisplay3.remove()
-    expect(plantquestGeofenceDisplay3._map).toEqual(null)
-  })
-})
-
-},{"../../verify/leaflet.js":6,"../dist/geofence-display.umd.cjs":1}],5:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 const Jester = (window.Jester = {
   exclude: [],
   state: {
@@ -39545,4 +39773,4 @@ module.exports = Leaflet
 });
 
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../GeofenceDisplay/node_modules/leaflet":2}]},{},[3]);
+},{"../GeofenceDisplay/node_modules/leaflet":4}]},{},[3]);
