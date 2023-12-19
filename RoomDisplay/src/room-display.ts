@@ -305,6 +305,7 @@ class Room {
     // BUG TODO: Zoom and tooltip defaults to C regardless of click unless rooms are added and removed first
     let self = this
     console.log('onClick', event)
+    console.log('clicked latlngs:', event.target._latlngs[0])
     // self.demoSelect()
     // self.ent.id = 'roomA' etc
     self.select(self.ent.id)
