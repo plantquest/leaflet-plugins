@@ -7,7 +7,7 @@ import '@plantquest/etage-control/dist/etage-control.css'
 import { PlantquestEtageControl } from '@plantquest/etage-control'
 import { Gubu } from 'gubu'
 
-const map = L.map('plantquest-assetmap-map', {
+const map = L.map('map', {
   crs: L.CRS.Simple,
   scrollWheelZoom: false,
   doubleClickZoom: false,
@@ -15,7 +15,8 @@ const map = L.map('plantquest-assetmap-map', {
   editable: true,
 })
 
-L.tileLayer('https://plantquest-demo01-map01.s3.eu-west-1.amazonaws.com/tiles/pqd-pq01-m01-013').addTo(map)
+const tileLayer = L.tileLayer('https://plantquest-demo01-map01.s3.eu-west-1.amazonaws.com/tiles/pqd-pq01-m01-013/{z}/{x}/{y}.png');
+tileLayer.addTo(map);
 
 //TODO: use GUBU to validate the options
 //TESTING GUBU
@@ -32,82 +33,84 @@ const PlantquestEtageControlOptionsShape = Gubu({
       center: [Number, Number],
       zoom: Number
     }
-  ]
+  ],
+  tileLayer: Object,
 })
 
 // Just some mock-up options for buildings and LEVELS, testing it visually.
 //USING GUBU
 const etageControlOptions = PlantquestEtageControlOptionsShape({
   position: 'topright',
-  debug: false,
+  // debug: false,
   buildings: [
-    { id: 'buildingA', name: 'Building A', center: [51.505, -0.09], zoom: 20 },
+    { id: 'buildingA', name: '112-AP1', center: [-75, 120], zoom: 3 },
     {
       id: 'buildingB',
-      name: 'Building B',
-      center: [51.5051, -0.088],
-      zoom: 20
+      name: '118-AP1',
+      center: [-120, 65],
+      zoom: 3
     },
-    { id: 'buildingC', name: 'Building C', center: [51.5054, -0.092], zoom: 20 }
+    // { id: 'buildingC', name: 'Building C', center: [51.5054, -0.092], zoom: 20 }
   ],
   levels: [
     {
       id: 'floor1',
-      name: 'Floor 1',
+      name: 'First Floor',
       building_id: 'buildingA',
-      center: [51.505, -0.09],
-      zoom: 20
+      center: [-75, 120],
+      zoom: 3
     },
     {
       id: 'floor2',
-      name: 'Floor 2',
+      name: 'Second Floor',
       building_id: 'buildingA',
-      center: [51.505, -0.09],
-      zoom: 20
+      center: [-75, 120],
+      zoom: 3
     },
     {
       id: 'floor1',
-      name: 'Floor 1',
+      name: 'First Floor',
       building_id: 'buildingB',
-      center: [51.5051, -0.088],
-      zoom: 20
+      center: [-120, 65],
+      zoom: 3
     },
     {
       id: 'floor2',
-      name: 'Floor 2',
+      name: 'Second Floor',
       building_id: 'buildingB',
-      center: [51.5051, -0.088],
-      zoom: 20
+      center: [-120, 65],
+      zoom: 3
     },
-    {
-      id: 'floor3',
-      name: 'Floor 3',
-      building_id: 'buildingB',
-      center: [51.5051, -0.088],
-      zoom: 20
-    },
-    {
-      id: 'basement',
-      name: 'Basement',
-      building_id: 'buildingB',
-      center: [51.5051, -0.088],
-      zoom: 20
-    },
-    {
-      id: 'floor1',
-      name: 'Floor 1',
-      building_id: 'buildingC',
-      center: [51.5054, -0.092],
-      zoom: 20
-    },
-    {
-      id: 'floor2',
-      name: 'Roof',
-      building_id: 'buildingC',
-      center: [51.5054, -0.092],
-      zoom: 20
-    }
-  ]
+    // {
+    //   id: 'floor3',
+    //   name: 'Floor 3',
+    //   building_id: 'buildingB',
+    //   center: [51.5051, -0.088],
+    //   zoom: 0
+    // },
+    // {
+    //   id: 'basement',
+    //   name: 'Basement',
+    //   building_id: 'buildingB',
+    //   center: [51.5051, -0.088],
+    //   zoom: 0
+    // },
+    // {
+    //   id: 'floor1',
+    //   name: 'Floor 1',
+    //   building_id: 'buildingC',
+    //   center: [51.5054, -0.092],
+    //   zoom: 0
+    // },
+    // {
+    //   id: 'floor2',
+    //   name: 'Roof',
+    //   building_id: 'buildingC',
+    //   center: [51.5054, -0.092],
+    //   zoom: 0
+    // }
+  ],
+  tileLayer: tileLayer,
 })
 
 const plantquestEtageControl = new PlantquestEtageControl(etageControlOptions)
