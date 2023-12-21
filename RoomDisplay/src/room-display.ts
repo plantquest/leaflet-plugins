@@ -90,6 +90,11 @@ const PlantquestRoomDisplay = L.Layer.extend({
   resetDemoSelect: function (_map: any) {
     _map.setView([50.154377, 2154.375], 1.7)
   },
+
+  simulateRoomClick: function (room: any) {
+    console.log('simulateRoomClick() function called. Room obj:', room)
+    // room.select(room.ent.id)
+  },
 })
 
 class Room {
