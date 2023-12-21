@@ -202,6 +202,9 @@ describe('RoomDisplay', () => {
     // import { fireEvent } from '@react/testing-library'
     // fireEvent.click(roomElement)
     // expect(event.target._latlngs[0]).toEqual(options.pqam.data.roomMap[roomElementID])
+
+    // clickRoom = Room object (extracted from map?)
+    plantquestRoomDisplay4.simulateRoomClick('simRoomA')
   })
 
   test('room-display-focus', () => {
