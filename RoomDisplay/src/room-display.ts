@@ -90,6 +90,11 @@ const PlantquestRoomDisplay = L.Layer.extend({
   resetDemoSelect: function (_map: any) {
     _map.setView([50.154377, 2154.375], 1.7)
   },
+
+  simulateRoomClick: function (room: any) {
+    console.log('simulateRoomClick() function called. Room obj:', room)
+    // room.select(room.ent.id)
+  },
 })
 
 class Room {
@@ -305,6 +310,7 @@ class Room {
     // BUG TODO: Zoom and tooltip defaults to C regardless of click unless rooms are added and removed first
     let self = this
     console.log('onClick', event)
+    console.log('clicked latlngs:', event.target._latlngs[0])
     // self.demoSelect()
     // self.ent.id = 'roomA' etc
     self.select(self.ent.id)

@@ -44,13 +44,13 @@ describe('RoomDisplay', () => {
         room: null,
         chosen: {
           poly: null,
-          room: null,
+          room: { poly: null },
         },
       },
       config: {
         mapImg: [7800, 5850],
         mapMaxZoom: 2,
-        mapRoomFocusZoom: 5,
+        mapRoomFocusZoom: 4,
         room: {
           click: {
             active: true,
@@ -61,7 +61,42 @@ describe('RoomDisplay', () => {
           color: '#33f',
         },
       },
-      data: { roomMap: { roomA: null, roomB: null, roomC: null } },
+      data: {
+        roomMap: {
+          roomA: {
+            id: 'roomA',
+            name: 'Room A',
+            poly: [
+              [52.7, 2086],
+              [52.7, 2115.7],
+              [47.4, 2115.7],
+              [47.4, 2086],
+            ],
+          },
+          roomB: {
+            id: 'roomB',
+            name: 'Room B',
+            poly: [
+              [60.6, 2235],
+              [60.6, 2255.3],
+              [58.3, 2255.3],
+              [58.3, 2252],
+              [56.1, 2252],
+              [56.1, 2235],
+            ],
+          },
+          roomC: {
+            id: 'roomC',
+            name: 'Room C',
+            poly: [
+              [3.4, 2155.6],
+              [3.4, 2172.5],
+              [-3.4, 2172.5],
+              [-3.4, 2155.6],
+            ],
+          },
+        },
+      },
       layer: { room: null },
       map: null,
       roomPopup: null,
@@ -143,6 +178,12 @@ describe('RoomDisplay', () => {
   })
 
   test('room-display-on-click', () => {
+    /*
+    Changes to look for:
+    - Room clicked on
+    - zoom to Room (focus())
+    - tooltip appears (select())
+    */
     let map5 = L.map(document.createElement('div'), {
       minZoom: 1.7,
     }).setView([50.154377, 2154.375], 1.7)
@@ -157,6 +198,13 @@ describe('RoomDisplay', () => {
 
     let plantquestRoomDisplay4 = new PlantquestRoomDisplay(options)
     plantquestRoomDisplay4.addTo(map5)
+
+    // import { fireEvent } from '@react/testing-library'
+    // fireEvent.click(roomElement)
+    // expect(event.target._latlngs[0]).toEqual(options.pqam.data.roomMap[roomElementID])
+
+    // clickRoom = Room object (extracted from map?)
+    plantquestRoomDisplay4.simulateRoomClick('simRoomA')
   })
 
   test('room-display-focus', () => {
