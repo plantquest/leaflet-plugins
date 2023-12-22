@@ -1,74 +1,56 @@
-import L from 'leaflet';
+import Leaftlet from 'leaflet';
 import 'leaflet.markercluster';
 
-export interface Asset {
-  id: string;
-  x: number;
-  y: number;
-  value: number;
-}
+export class PlantquestAssetDisplay extends Leaftlet.Control {
+  private map!: Leaftlet.Map;
+  private clusterGroup!: Leaftlet.MarkerClusterGroup;
+  private assets: any[];
 
-interface AssetDisplayOptions extends L.ControlOptions {
-  assets: Asset[];
-}
-
-interface CustomMarker extends L.Marker {
-  assetValue?: number;
-}
-
-export const PlantquestAssetDisplay = L.Control.extend({
-  options: {} as AssetDisplayOptions,
-  _map: null as L.Map | null,
-
-  initialize: function (options: AssetDisplayOptions) {
-    L.Util.setOptions(this, options);
-  },
-
-  onAdd: function (map: L.Map) {
-    this._map = map;
-    const clusterGroup = L.markerClusterGroup({
-      maxClusterRadius: 40, // Adjust this value as needed
-      spiderfyOnMaxZoom: true,
-      iconCreateFunction: function(cluster) {
-        console.log("Cluster being created with markers:", cluster.getAllChildMarkers());
-        const childMarkers = cluster.getAllChildMarkers() as CustomMarker[];
-        let sum = 0;
-        childMarkers.forEach(marker => {
-          sum += marker.assetValue || 0;
-        });
-
-        const clusterColor = sum > 10 ? 'yellow' : 'lightgreen';
-        return L.divIcon({
-          html: `<div class="cluster-marker" style="background-color: ${clusterColor};">${sum}</div>`,
-          className: 'marker-cluster',
-          iconSize: L.point(40, 40)
-        });
-      }
-    });
-
-    console.log('this.options', this.options)
-    this.options.assets.forEach(asset => {
-      if (typeof asset.x === 'number' && typeof asset.y === 'number') {
-        const marker = L.marker([asset.y, asset.x], {
-          icon: L.divIcon({
-            html: `<div class="asset-marker">${asset.value}</div>`,
-            className: 'marker-asset',
-            iconSize: L.point(30, 30)
-          })
-        }) as CustomMarker;
-        marker.assetValue = asset.value;
-        console.log('marker', marker);
-        clusterGroup.addLayer(marker);
-      } else {
-        console.error('Invalid asset coordinates:', asset);
-      }
-    });
-
-    map.addLayer(clusterGroup);
-    return L.DomUtil.create('div', 'asset-display-container');
-  },
-
-  onRemove: function (_map: L.Map) {
-    // Clean up if needed
+  constructor(assets: any[]) {
+      super();
+      this.assets = assets;
+      console.log('PlantquestAssetDisplay constructor', assets);
   }
-});
+
+  onAdd(map: Leaftlet.Map): HTMLElement {
+      console.log('PlantquestAssetDisplay onAdd', map);
+      this.map = map;
+      this.initializeMap();
+      return document.createElement('div');
+  }
+
+  private initializeMap(): void {
+      this.clusterGroup = Leaftlet.markerClusterGroup({
+          maxClusterRadius: 40,
+          spiderfyOnMaxZoom: true,
+          iconCreateFunction: (cluster) => {
+              let sum = 0;
+              cluster.getAllChildMarkers().forEach((marker: any) => {
+                  sum += marker.options.value; // Accumulate the sum of the values
+              });
+
+              return Leaftlet.divIcon({
+                  html: `<div class="cluster-marker">${sum}</div>`,
+                  className: 'marker-cluster',
+                  iconSize: Leaftlet.point(40, 40)
+              });
+          }
+      });
+
+      // Add assets as markers
+        this.assets.forEach(asset => {
+          const marker = Leaftlet.marker(Leaftlet.latLng(parseFloat(asset.y), parseFloat(asset.x)), {
+            icon: Leaftlet.divIcon({
+              html: `<div class="asset-marker">${asset.value}</div>`,
+              className: 'marker-asset',
+            }),
+            value: asset.value  // Store the value in the marker options
+          } as Leaftlet.MarkerOptions); // Add type assertion to specify 'value' property
+          console.log("Adding marker at: ", asset.y, asset.x); // Log for debugging
+          this.clusterGroup.addLayer(marker);
+        });
+
+        // Add the cluster group to the map
+        this.map.addLayer(this.clusterGroup);
+  }
+}
