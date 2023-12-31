@@ -30,8 +30,6 @@ const PlantquestItemFilter = L.Control.extend({
     self._container = container
     L.DomEvent.disableClickPropagation(container)
 
-    self._initLayout(container)
-
     return container
   },
 
